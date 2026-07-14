@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TREMOR — US Macro Event Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0C10;
+    --panel:#12151B;
+    --panel-2:#171B22;
+    --hairline:#242932;
+    --text-hi:#F3F1E9;
+    --text-lo:#868C9A;
+    --text-mid:#B7BBC4;
+    --hot:#E8552B;
+    --hot-dim:#3A241C;
+    --cold:#2F7DE8;
+    --cold-dim:#1B2638;
+    --amber:#E8B32E;
+    --amber-dim:#3A311B;
+    --info:#8B7FE8;
+    --info-dim:#251F3A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{background:var(--ink); color:var(--text-hi); font-family:'Inter',sans-serif;}
+  ::selection{background:var(--hot); color:var(--ink);}
+
+  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.94); backdrop-filter:blur(10px);}
+  .header-inner{max-width:1100px; margin:0 auto;}
+  .brand{display:flex; align-items:baseline; gap:12px;}
+  .brand h1{font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:34px; letter-spacing:-0.01em;}
+  .brand .dot{width:9px; height:9px; border-radius:50%; background:var(--hot); box-shadow:0 0 0 4px var(--hot-dim);}
+  .brand-sub{color:var(--text-lo); font-size:13px; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px;}
+
+  main{max-width:1100px; margin:0 auto; padding:32px 24px 80px;}
+  .lede{max-width:640px; margin-bottom:26px;}
+  .lede p{color:var(--text-lo); font-size:14.5px; line-height:1.6;}
+  .surprise-note{
+    max-width:640px; margin-bottom:26px; padding:14px 16px; border-radius:9px;
+    background:var(--amber-dim); border:1px solid #4A3F1E; font-size:13px; color:var(--text-mid); line-height:1.6;
+  }
+  .surprise-note b{color:var(--amber);}
+
+  .search-row{margin-bottom:30px;}
+  .search-row input{
+    width:100%; background:var(--panel); border:1px solid var(--hairline); border-radius:10px;
+    padding:13px 16px; color:var(--text-hi); font-family:'JetBrains Mono',monospace; font-size:13.5px;
+  }
+  .search-row input::placeholder{color:var(--text-lo);}
+  .search-row input:focus{outline:none; border-color:var(--text-lo);}
+
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:30px;}
+  .chip{
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase;
+    padding:7px 14px; border-radius:100px; border:1px solid var(--hairline); background:var(--panel);
+    color:var(--text-mid); cursor:pointer; transition:all .15s ease; user-select:none;
+  }
+  .chip:hover{border-color:var(--text-lo);}
+  .chip.active{background:var(--text-hi); color:var(--ink); border-color:var(--text-hi);}
+
+  .category{margin-bottom:40px;}
+  .cat-head{display:flex; align-items:baseline; gap:12px; margin-bottom:14px;}
+  .cat-head h2{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:19px;}
+  .cat-head::after{content:''; flex:1; height:1px; background:var(--hairline);}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:10px;}
+  .card{
+    background:var(--panel); border:1px solid var(--hairline); border-radius:10px;
+    padding:16px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease;
+  }
+  .card:hover{border-color:var(--text-lo); background:var(--panel-2);}
+  .card .name{font-size:14.5px; font-weight:600; color:var(--text-hi); margin-bottom:5px;}
+  .card .sub{font-size:12px; color:var(--text-lo); line-height:1.5;}
+  .card-meta{display:flex; align-items:center; justify-content:space-between; margin-top:12px;}
+  .seismo{display:flex; align-items:flex-end; gap:2px; height:18px;}
+  .seismo i{display:block; width:3.5px; border-radius:1px; background:var(--hairline);}
+  .badge{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.05em; font-weight:700;
+    padding:4px 9px; border-radius:5px; white-space:nowrap;
+  }
+  .b-veryhigh{background:var(--hot-dim); color:var(--hot);}
+  .b-high{background:var(--amber-dim); color:var(--amber);}
+  .b-medium{background:var(--cold-dim); color:var(--cold);}
+  .b-low{background:#1B1E24; color:var(--text-lo);}
+  .b-info{background:var(--info-dim); color:var(--info);}
+
+  footer{text-align:center; padding:20px 24px 50px; color:var(--text-lo); font-size:12px; font-family:'JetBrains Mono',monospace;}
+
+  section.head{margin:52px 0 18px; display:flex; align-items:baseline; gap:12px;}
+  section.head h2{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:22px;}
+  section.head span{color:var(--text-lo); font-size:12.5px; font-family:'JetBrains Mono',monospace; flex:1; text-align:right;}
+
+  .rules{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .rule-card{border:1px solid var(--hairline); border-radius:10px; padding:22px; background:var(--panel);}
+  .rule-card.hotr{border-left:3px solid var(--hot);}
+  .rule-card.coldr{border-left:3px solid var(--cold);}
+  .rule-card h3{font-family:'Fraunces',serif; font-size:18px; margin-bottom:10px;}
+  .rule-card.hotr h3{color:var(--hot);}
+  .rule-card.coldr h3{color:var(--cold);}
+  .rule-card .flow{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-mid); line-height:1.9;}
+  .rule-card .flow b{color:var(--text-hi);}
+
+  .priority{display:flex; flex-direction:column; gap:10px;}
+  .prow{display:grid; grid-template-columns:130px 1fr; gap:16px; align-items:center; padding:12px 14px; background:var(--panel); border-radius:8px; border:1px solid var(--hairline);}
+  .plabel{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.05em; padding:5px 0; text-align:center; border-radius:5px;}
+  .prow.vh .plabel{background:var(--hot-dim); color:var(--hot);}
+  .prow.h .plabel{background:var(--amber-dim); color:var(--amber);}
+  .prow.m .plabel{background:var(--cold-dim); color:var(--cold);}
+  .plist{font-size:13.5px; color:var(--text-mid);}
+
+  @media (max-width:640px){
+    .matrix{grid-template-columns:1fr;}
+    .grid{grid-template-columns:1fr;}
+    .rules{grid-template-columns:1fr;}
+    .prow{grid-template-columns:1fr; gap:6px;}
+  }
+
+  /* ---------- MODAL ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(6,7,9,0.72); backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; z-index:100;
+    opacity:0; pointer-events:none; transition:opacity .2s ease; padding:20px;
+  }
+  .overlay.show{opacity:1; pointer-events:all;}
+  .modal{
+    background:var(--panel-2); border:1px solid var(--hairline); border-radius:14px;
+    max-width:640px; width:100%; max-height:86vh; overflow-y:auto;
+    padding:30px; transform:translateY(14px); transition:transform .2s ease;
+  }
+  .overlay.show .modal{transform:translateY(0);}
+  .modal-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
+  .modal-top h2{font-family:'Fraunces',serif; font-size:25px; font-weight:600;}
+  .modal-close{background:none; border:1px solid var(--hairline); color:var(--text-lo); width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; flex-shrink:0;}
+  .modal-close:hover{color:var(--text-hi); border-color:var(--text-lo);}
+  .modal-meta{color:var(--text-lo); font-size:13px; font-family:'JetBrains Mono',monospace; margin-bottom:20px; line-height:1.6;}
+
+  .matrix{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:18px;}
+  .mcol{border-radius:10px; padding:18px; border:1px solid var(--hairline);}
+  .mcol.hotc{background:linear-gradient(180deg, var(--hot-dim), transparent); border-color:#4A2E20;}
+  .mcol.coldc{background:linear-gradient(180deg, var(--cold-dim), transparent); border-color:#233450;}
+  .mcol h4{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; margin-bottom:14px;}
+  .mcol.hotc h4{color:var(--hot);}
+  .mcol.coldc h4{color:var(--cold);}
+  .mrow{display:flex; justify-content:space-between; font-size:13.5px; padding:7px 0; border-bottom:1px dashed var(--hairline);}
+  .mrow:last-of-type{border-bottom:none;}
+  .mrow .k{color:var(--text-lo);}
+  .mrow .v{font-family:'JetBrains Mono',monospace; font-weight:700;}
+  .v.up{color:var(--hot);} .v.down{color:var(--cold);}
+  .fed-line{margin-top:12px; padding-top:12px; border-top:1px solid var(--hairline); font-size:12.5px; color:var(--text-mid);}
+  .fed-line b{color:var(--text-hi);}
+  .modal-note{font-size:13px; color:var(--text-lo); line-height:1.6; padding:14px 16px; background:var(--panel); border-radius:8px; border:1px solid var(--hairline);}
+  .corr-section{margin-bottom:18px;}
+  .corr-label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em; color:var(--text-lo); text-transform:uppercase; margin-bottom:9px;}
+  .corr-chips{display:flex; flex-wrap:wrap; gap:7px;}
+  .corr-chip{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; padding:5px 11px; border-radius:6px; background:var(--panel); border:1px solid var(--hairline); color:var(--text-hi);}
+  .info-box{padding:18px; background:var(--info-dim); border:1px solid #372E56; border-radius:10px; font-size:13.5px; color:var(--text-mid); line-height:1.7;}
+  .info-box b{color:var(--info);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand"><h1>TREMOR</h1><span class="dot"></span></div>
+    <div class="brand-sub">US Macro Event Reference · Market Effect Lookup</div>
+  </div>
+</header>
+
+<main>
+  <div class="lede">
+    <p>Every US economic release and Fed event that regularly moves markets. Tap any card to see how it typically reacts to a hot (better than expected) vs. cold (worse than expected) print.</p>
+  </div>
+
+  <div class="surprise-note">
+    <b>Reaction depends on the surprise, not the number.</b> A "hot" CPI that lands exactly at consensus barely moves anything — the hot/cold effect below only fires when the actual print beats or misses what the market had already priced in.
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="search" placeholder="Search an event… e.g. CPI, jobless claims, PMI">
+  </div>
+
+  <div class="filters" id="filters">
+    <div class="chip active" data-f="ALL">All</div>
+    <div class="chip" data-f="VERY HIGH">Very high</div>
+    <div class="chip" data-f="HIGH">High</div>
+    <div class="chip" data-f="MEDIUM">Medium</div>
+    <div class="chip" data-f="LOW">Low</div>
+  </div>
+
+  <div id="categories"></div>
+
+  <section class="head"><h2>The golden rules</h2><span>core macro mechanics</span></section>
+  <div class="rules">
+    <div class="rule-card hotr">
+      <h3>Hot regime — strong economy + high inflation</h3>
+      <div class="flow"><b>USD ↑</b> · <b>Yields ↑</b> · Fed more hawkish · Stocks often <b>↓</b></div>
+    </div>
+    <div class="rule-card coldr">
+      <h3>Cold regime — weak economy + falling inflation</h3>
+      <div class="flow"><b>USD ↓</b> · <b>Yields ↓</b> · Fed more dovish · Stocks often <b>↑</b> <span style="color:var(--text-lo)">(rate-cut bid)</span></div>
+    </div>
+  </div>
+
+  <section class="head"><h2>Impact priority</h2><span>which prints actually matter</span></section>
+  <div class="priority">
+    <div class="prow vh"><div class="plabel">VERY HIGH</div><div class="plist">CPI Inflation · Non-Farm Payrolls · FOMC Rate Decision · Core PCE · Fed Chair Testimony</div></div>
+    <div class="prow h"><div class="plabel">HIGH</div><div class="plist">Retail Sales · ISM Manufacturing PMI · ISM Services PMI · Unemployment Rate · Average Hourly Earnings · Jobless Claims · UMich Sentiment</div></div>
+    <div class="prow m"><div class="plabel">MEDIUM</div><div class="plist">GDP Growth · Consumer Confidence · JOLTS Job Openings · PPI · FOMC Minutes · Beige Book · Housing Starts · Industrial Production</div></div>
+  </div>
+
+  <footer>Reactions describe typical, historically consistent directional effects — not a guarantee of any single release's outcome.</footer>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+const DATA = [
+{cat:"Inflation", items:[
+  {name:"CPI & Core CPI", impact:"VERY HIGH", sub:"Monthly · biggest standalone inflation gauge",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"More Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"More Dovish"},
+   note:"The single highest-impact print after the Fed decision and jobs report itself. Core matters more than headline for Fed pricing."},
+  {name:"PPI & Core PPI", impact:"MEDIUM", sub:"Wholesale / producer-side price pressure",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"Slightly Dovish"},
+   note:"Same direction as CPI, smaller magnitude. A leading indicator — producer costs often pass through to consumer prices 1–2 months later."},
+  {name:"PCE Price Index & Core PCE", impact:"VERY HIGH", sub:"The Fed's own preferred inflation measure",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"More Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"More Dovish"},
+   note:"Same direction as CPI, but moves rate-cut odds even more directly since it's the FOMC's explicit target gauge."},
+]},
+{cat:"Employment", items:[
+  {name:"Non-Farm Payrolls (NFP)", impact:"VERY HIGH", sub:"First Friday of month · the biggest scheduled data mover",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"More Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"More Dovish"},
+   note:"Stocks often dip initially on a hot print before repricing as yields settle. Second only to the FOMC decision itself."},
+  {name:"Unemployment Rate", impact:"HIGH", sub:"Released alongside NFP",
+   hot:{usd:"UP",yields:"UP",stocks:"MIXED",fed:"More Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"MIXED",fed:"More Dovish"},
+   note:"\"Hot\" here means a lower rate. Stocks reaction is genuinely mixed — depends heavily on why the rate moved."},
+  {name:"Weekly Initial Jobless Claims", impact:"HIGH", sub:"Every Thursday",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"Dovish"},
+   note:"\"Hot\" = fewer claims (tighter labor market). Smaller than NFP but the most frequent live read on labor health between NFP prints."},
+  {name:"ADP Employment Report", impact:"LOW", sub:"Private payrolls · precedes NFP by ~2 days",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"Slightly Dovish"},
+   note:"Directionally similar to NFP but a historically weak predictor of it — muted reaction unless it wildly diverges from consensus."},
+  {name:"JOLTS Job Openings", impact:"MEDIUM", sub:"Labor demand / slack signal",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"Dovish"},
+   note:"More openings signals a tighter labor market — a slack gauge the Fed watches closely for wage-inflation risk."},
+  {name:"Average Hourly Earnings", impact:"HIGH", sub:"Wage inflation signal · released with NFP",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"More Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"More Dovish"},
+   note:"A direct services-inflation input — watched closely alongside the headline NFP number."},
+]},
+{cat:"Federal Reserve / Monetary Policy", items:[
+  {name:"FOMC Rate Decision", impact:"VERY HIGH", sub:"8x/year · the single biggest event on the calendar", info:true,
+   note:"No hot/cold print to react to — markets trade the decision itself, the dot plot, and the press conference tone in real time. The largest single mover across all asset classes."},
+  {name:"FOMC Minutes", impact:"MEDIUM", sub:"Released 3 weeks after each meeting", info:true,
+   note:"Backward-looking. Moves markets only when it reveals a more hawkish or dovish committee lean than the original post-meeting statement suggested."},
+  {name:"Fed Chair Press Conference / Testimony", impact:"VERY HIGH", sub:"No scheduled data — pure tone-trading", info:true,
+   note:"Hawkish phrasing on rates or inflation lifts USD & yields; dovish or cautious phrasing does the reverse. Headlines move price in real time during the remarks."},
+  {name:"Fed Beige Book", impact:"MEDIUM", sub:"Regional economic conditions, ~2 weeks before FOMC", info:true,
+   note:"A read on the committee's mood heading into the next decision — a slow-burn mover rather than a spike."},
+  {name:"Regional Fed Speeches", impact:"LOW", sub:"Williams, Musalem, Jefferson, Logan, etc.", info:true,
+   note:"Market-moving only if the speaker deviates from the current committee consensus — otherwise largely priced in already."},
+]},
+{cat:"Growth", items:[
+  {name:"GDP (Advance / Preliminary / Final)", impact:"MEDIUM", sub:"Quarterly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Dovish"},
+   note:"Backward-looking and often stale by release — smaller reaction unless it surprises sharply against consensus."},
+  {name:"GDPNow (Atlanta Fed)", impact:"LOW", sub:"Real-time running estimate, not a scheduled release", info:true,
+   note:"Doesn't itself move markets on release — it's continuously updated. Shifts in it reshape expectations ahead of the real GDP print."},
+]},
+{cat:"Consumer Activity", items:[
+  {name:"Retail Sales & Core Retail Sales", impact:"HIGH", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"More Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"More Dovish"},
+   note:"Stocks rise on a hot print only if inflation is calm elsewhere — otherwise it reads as hawkish risk-off instead."},
+  {name:"U. Michigan Consumer Sentiment", impact:"HIGH", sub:"Preliminary & Final, monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"—"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"—"},
+   note:"Rarely moves the Fed alone, but the inflation-expectations sub-component inside it gets outsized attention."},
+  {name:"Consumer Confidence Index (Conference Board)", impact:"MEDIUM", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"—"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"—"},
+   note:"Same direction and similarly modest impact as UMich sentiment — sets tone rather than causing spikes."},
+  {name:"Personal Income & Personal Spending", impact:"LOW", sub:"Released same day as PCE",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Usually overshadowed by the PCE print released alongside it — PCE is the actual mover of the two."},
+]},
+{cat:"Manufacturing / Business", items:[
+  {name:"ISM Manufacturing PMI", impact:"HIGH", sub:"Monthly · 50 = expansion/contraction line",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Forward-looking survey — traded as a growth signal first, inflation signal (via prices-paid subindex) second."},
+  {name:"ISM Services PMI", impact:"HIGH", sub:"Monthly · covers ~80% of US economic output",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Often a bigger mover than manufacturing PMI given services' larger share of the US economy."},
+  {name:"Empire State Manufacturing Index", impact:"MEDIUM", sub:"NY Fed regional survey",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"An early regional read ahead of the national ISM prints — smaller reaction, useful as a leading signal."},
+  {name:"Philadelphia Fed Manufacturing Index", impact:"MEDIUM", sub:"Regional survey",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Same role as Empire State — regional preview data, contained reaction."},
+  {name:"Durable Goods Orders", impact:"MEDIUM", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Volatile due to lumpy aircraft/defense orders — the \"core\" (ex-transportation) figure matters more than headline."},
+  {name:"Industrial Production & Capacity Utilization", impact:"MEDIUM", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Factory-side growth confirmation — usually a secondary mover behind PMI and NFP."},
+]},
+{cat:"Housing", items:[
+  {name:"Housing Starts & Building Permits", impact:"MEDIUM", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Rate-sensitive sector — reaction is usually contained unless it diverges sharply from forecast."},
+  {name:"Existing Home Sales", impact:"LOW", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"Same direction as other housing data — low standalone impact."},
+  {name:"New Home Sales", impact:"LOW", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"Slightly Dovish"},
+   note:"More volatile than existing home sales due to a smaller sample — reaction still generally contained."},
+  {name:"Pending Home Sales", impact:"LOW", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"—"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"—"},
+   note:"Low-impact — a leading indicator for existing home sales one to two months out, rarely moves price alone."},
+  {name:"NAHB Home Builder Confidence Index", impact:"LOW", sub:"Monthly survey",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"—"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"—"},
+   note:"Sentiment survey, not hard data — low standalone impact but an early housing-sector signal."},
+  {name:"Case-Shiller Home Price Index", impact:"LOW", sub:"Monthly, ~2-month lag",
+   hot:{usd:"UP",yields:"UP",stocks:"UP",fed:"—"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"DOWN",fed:"—"},
+   note:"Reported with a lag, so markets have often already priced in the trend — muted reaction."},
+]},
+{cat:"Trade / External", items:[
+  {name:"Trade Balance", impact:"LOW", sub:"Monthly",
+   hot:{usd:"UP",yields:"—",stocks:"—",fed:"—"}, cold:{usd:"DOWN",yields:"—",stocks:"—",fed:"—"},
+   note:"A narrower deficit is mildly USD-positive. Low standalone impact — more relevant as a GDP input."},
+  {name:"Import / Export Price Index", impact:"LOW", sub:"Monthly",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"Slightly Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"Slightly Dovish"},
+   note:"Same direction as CPI but very low standalone impact — mostly used as an imported-inflation cross-check."},
+]},
+{cat:"Other", items:[
+  {name:"Monthly Federal Budget Statement", impact:"LOW", sub:"Treasury receipts & outlays", info:true,
+   note:"Rarely market-moving alone — relevant mainly for deficit and Treasury-issuance-driven yield narratives."},
+  {name:"Treasury Auctions (10Y, 30Y)", impact:"MEDIUM", sub:"Scheduled debt issuance",
+   hot:{usd:"MIXED",yields:"DOWN",stocks:"—",fed:"—"}, cold:{usd:"MIXED",yields:"UP",stocks:"—",fed:"—"},
+   note:"\"Hot\" here = strong demand (low tail, high bid-to-cover) → yields fall. Weak demand → yields rise. Watched closely by rates traders specifically."},
+  {name:"Michigan Inflation Expectations", impact:"MEDIUM", sub:"Sub-component of UMich Sentiment",
+   hot:{usd:"UP",yields:"UP",stocks:"DOWN",fed:"Hawkish"}, cold:{usd:"DOWN",yields:"DOWN",stocks:"UP",fed:"Dovish"},
+   note:"Rising expectations reads as hawkish even if the headline sentiment number is soft — the Fed watches this sub-index closely."},
+]},
+];
+
+// When each release typically hits, relative to the London/NY liquidity overlap (8am–12pm ET).
+const SESSION = {
+  "CPI & Core CPI": "Overlap · 8:30am ET",
+  "PPI & Core PPI": "Overlap · 8:30am ET",
+  "PCE Price Index & Core PCE": "Overlap · 8:30am ET",
+  "Non-Farm Payrolls (NFP)": "Overlap · 8:30am ET",
+  "Unemployment Rate": "Overlap · 8:30am ET",
+  "Weekly Initial Jobless Claims": "Overlap · 8:30am ET",
+  "ADP Employment Report": "Overlap · 8:15am ET",
+  "Average Hourly Earnings": "Overlap · 8:30am ET",
+  "GDP (Advance / Preliminary / Final)": "Overlap · 8:30am ET",
+  "Retail Sales & Core Retail Sales": "Overlap · 8:30am ET",
+  "Durable Goods Orders": "Overlap · 8:30am ET",
+  "Industrial Production & Capacity Utilization": "Overlap · 9:15am ET",
+  "Housing Starts & Building Permits": "Overlap · 8:30am ET",
+  "Import / Export Price Index": "Overlap · 8:30am ET",
+  "Personal Income & Personal Spending": "Overlap · 8:30am ET",
+  "Trade Balance": "Overlap · 8:30am ET",
+  "Empire State Manufacturing Index": "Overlap · 8:30am ET",
+  "Philadelphia Fed Manufacturing Index": "Overlap · 8:30am ET",
+  "JOLTS Job Openings": "Overlap · 10am ET",
+  "U. Michigan Consumer Sentiment": "Overlap · 10am ET",
+  "Michigan Inflation Expectations": "Overlap · 10am ET",
+  "Consumer Confidence Index (Conference Board)": "Overlap · 10am ET",
+  "ISM Manufacturing PMI": "Overlap · 10am ET",
+  "ISM Services PMI": "Overlap · 10am ET",
+  "Existing Home Sales": "Overlap · 10am ET",
+  "New Home Sales": "Overlap · 10am ET",
+  "Pending Home Sales": "Overlap · 10am ET",
+  "NAHB Home Builder Confidence Index": "Overlap · 10am ET",
+  "Case-Shiller Home Price Index": "Overlap · 9am ET",
+  "FOMC Rate Decision": "NY afternoon · 2pm ET, overlap has ended",
+  "Fed Chair Press Conference / Testimony": "NY afternoon · ~2:30pm ET, overlap has ended",
+  "Fed Beige Book": "NY afternoon · 2pm ET",
+  "FOMC Minutes": "NY afternoon · 2pm ET",
+  "Treasury Auctions (10Y, 30Y)": "NY afternoon · 1pm ET",
+  "Monthly Federal Budget Statement": "NY afternoon · variable",
+  "Regional Fed Speeches": "Varies — often thin evening hours, check the specific time",
+  "GDPNow (Atlanta Fed)": "Continuous estimate — no fixed release time",
+};
+
+// 2-3 events each indicator is commonly read alongside — a hot print combined with a
+// contradicting companion often reads very differently than the same print in isolation.
+const CONTEXT = {
+  "CPI & Core CPI": "Read alongside PPI (leading signal) and the next PCE print — a hot CPI that PPI already foreshadowed is less of a surprise than one that comes out of nowhere.",
+  "PPI & Core PPI": "Read as a preview of CPI 1–2 months out. A hot PPI with a soft CPI the same week suggests margin absorption rather than a real inflation problem.",
+  "PCE Price Index & Core PCE": "The Fed's own gauge — weighed most heavily right before an FOMC meeting. A hot PCE days before a decision raises the odds of hawkish guidance regardless of what CPI showed weeks earlier.",
+  "Non-Farm Payrolls (NFP)": "Always read together with Average Hourly Earnings and the Unemployment Rate. Hot headline + soft wages reads dovish-ish; hot headline + hot wages reads fully hawkish.",
+  "Unemployment Rate": "Check against the participation rate context and NFP headline the same day — a lower rate driven by people leaving the labor force reads very differently than one driven by hiring.",
+  "Weekly Initial Jobless Claims": "Most useful as a trend across 3–4 weeks rather than a single print — one week rarely moves the Fed's view alone.",
+  "Average Hourly Earnings": "Paired with NFP headline — this is the piece that determines whether a strong jobs report is inflationary or just healthy growth.",
+  "JOLTS Job Openings": "Read against the quits rate (within the same report) — high openings with a falling quits rate signals employer-side caution despite the headline.",
+  "GDP (Advance / Preliminary / Final)": "Check the underlying mix — strong headline driven by inventory build reads differently than one driven by consumer spending.",
+  "Retail Sales & Core Retail Sales": "Read against the same week's CPI — hot sales with hot inflation is a clean hawkish combo; hot sales with soft inflation is the 'soft landing' read markets like.",
+  "ISM Manufacturing PMI": "Check the prices-paid sub-index specifically — that's the inflation-relevant piece, not just the headline expansion/contraction number.",
+  "ISM Services PMI": "Same as manufacturing — the prices-paid and employment sub-components often matter more than the headline print.",
+  "FOMC Rate Decision": "Read together with the dot plot and the Chair's press conference tone — the decision itself is often already priced in; the guidance is what actually moves markets.",
+  "Fed Chair Press Conference / Testimony": "Weighed against the most recent CPI/PCE and NFP prints — the market checks whether the tone matches or diverges from what the latest data already showed.",
+  "FOMC Minutes": "Only moves markets if it reveals a more hawkish or dovish lean than the original post-meeting statement did — otherwise it's stale by three weeks.",
+  "Housing Starts & Building Permits": "Read together — permits lead starts by design, so a starts miss with strong permits often gets read as noise rather than a real slowdown.",
+};
+
+// Instruments that typically move hardest on each release — for context only, not a guarantee.
+const PAIRS = {
+  "CPI & Core CPI": ["DXY","EURUSD","XAUUSD","US10Y","SPX"],
+  "PPI & Core PPI": ["DXY","XAUUSD","US10Y"],
+  "PCE Price Index & Core PCE": ["DXY","XAUUSD","US10Y","SPX"],
+  "Non-Farm Payrolls (NFP)": ["DXY","EURUSD","XAUUSD","US10Y","SPX"],
+  "Unemployment Rate": ["DXY","XAUUSD","SPX"],
+  "Weekly Initial Jobless Claims": ["DXY","XAUUSD"],
+  "ADP Employment Report": ["DXY"],
+  "JOLTS Job Openings": ["DXY","US10Y"],
+  "Average Hourly Earnings": ["DXY","XAUUSD","US10Y"],
+  "FOMC Rate Decision": ["DXY","EURUSD","XAUUSD","US10Y","SPX","BTCUSD"],
+  "FOMC Minutes": ["DXY","US10Y"],
+  "Fed Chair Press Conference / Testimony": ["DXY","XAUUSD","US10Y","SPX"],
+  "Fed Beige Book": ["US10Y"],
+  "Regional Fed Speeches": ["DXY"],
+  "GDP (Advance / Preliminary / Final)": ["DXY","SPX","US10Y"],
+  "Retail Sales & Core Retail Sales": ["DXY","XAUUSD","SPX"],
+  "U. Michigan Consumer Sentiment": ["DXY","XAUUSD"],
+  "Consumer Confidence Index (Conference Board)": ["SPX","DXY"],
+  "Personal Income & Personal Spending": ["DXY"],
+  "ISM Manufacturing PMI": ["DXY","SPX"],
+  "ISM Services PMI": ["DXY","SPX"],
+  "Empire State Manufacturing Index": ["DXY"],
+  "Philadelphia Fed Manufacturing Index": ["DXY"],
+  "Durable Goods Orders": ["DXY"],
+  "Industrial Production & Capacity Utilization": ["DXY"],
+  "Housing Starts & Building Permits": ["DXY","US10Y"],
+  "Existing Home Sales": ["DXY"],
+  "New Home Sales": ["DXY"],
+  "Pending Home Sales": ["DXY"],
+  "NAHB Home Builder Confidence Index": ["DXY"],
+  "Case-Shiller Home Price Index": ["DXY"],
+  "Trade Balance": ["DXY"],
+  "Import / Export Price Index": ["DXY"],
+  "Monthly Federal Budget Statement": ["US10Y"],
+  "Treasury Auctions (10Y, 30Y)": ["US10Y","DXY"],
+  "Michigan Inflation Expectations": ["DXY","XAUUSD","US10Y"],
+};
+
+const IMPACT_BARS = {"VERY HIGH":5,"HIGH":4,"MEDIUM":3,"LOW":2,"INFO":1};
+const IMPACT_CLASS = {"VERY HIGH":"b-veryhigh","HIGH":"b-high","MEDIUM":"b-medium","LOW":"b-low","INFO":"b-info"};
+
+function seismoBars(impact){
+  const n = IMPACT_BARS[impact] || 1;
+  let html = '';
+  for(let i=1;i<=5;i++){
+    const active = i<=n;
+    const h = 5 + i*2.6;
+    const color = active ? (impact==="VERY HIGH"?"var(--hot)":impact==="HIGH"?"var(--amber)":impact==="MEDIUM"?"var(--cold)":"var(--text-lo)") : "var(--hairline)";
+    html += `<i style="height:${h}px;background:${color}"></i>`;
+  }
+  return html;
+}
+
+const catEl = document.getElementById('categories');
+
+function arrowVal(v){
+  if(v==="UP") return `<span class="v up">↑ UP</span>`;
+  if(v==="DOWN") return `<span class="v down">↓ DOWN</span>`;
+  return `<span class="v" style="color:var(--text-mid)">${v}</span>`;
+}
+
+let activeImpact = "ALL";
+
+function render(filter=""){
+  catEl.innerHTML = '';
+  const f = filter.trim().toLowerCase();
+  DATA.forEach(group=>{
+    const items = group.items.filter(it => {
+      const matchesText = !f || it.name.toLowerCase().includes(f) || (it.sub||"").toLowerCase().includes(f);
+      const matchesImpact = activeImpact === "ALL" || it.impact === activeImpact;
+      return matchesText && matchesImpact;
+    });
+    if(items.length === 0) return;
+    const block = document.createElement('div');
+    block.className = 'category';
+    block.innerHTML = `<div class="cat-head"><h2>${group.cat}</h2></div><div class="grid"></div>`;
+    const grid = block.querySelector('.grid');
+    items.forEach(it=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="name">${it.name}</div>
+        <div class="sub">${it.sub||""}</div>
+        <div class="card-meta">
+          <div class="seismo">${seismoBars(it.impact)}</div>
+          <div class="badge ${IMPACT_CLASS[it.impact]}">${it.impact}</div>
+        </div>
+      `;
+      card.addEventListener('click', ()=>openModal(it));
+      grid.appendChild(card);
+    });
+    catEl.appendChild(block);
+  });
+}
+
+const overlay = document.getElementById('overlay');
+const modalBody = document.getElementById('modalBody');
+
+function openModal(it){
+  const pairs = PAIRS[it.name];
+  const session = SESSION[it.name];
+  const context = CONTEXT[it.name];
+
+  const corrHtml = pairs ? `
+    <div class="corr-section">
+      <div class="corr-label">Reacts hardest in</div>
+      <div class="corr-chips">${pairs.map(p=>`<div class="corr-chip">${p}</div>`).join('')}</div>
+    </div>
+  ` : "";
+
+  const sessionHtml = session ? `<div class="corr-section"><div class="corr-label">Typical timing</div><div style="font-size:13px;color:var(--text-mid)">${session}</div></div>` : "";
+
+  let html = `
+    <div class="modal-top">
+      <h2>${it.name}</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-meta">${it.sub||""} · <span class="badge ${IMPACT_CLASS[it.impact]}" style="margin-left:4px;">${it.impact}</span></div>
+    ${sessionHtml}
+    ${corrHtml}
+  `;
+  const contextHtml = context ? `<div class="modal-note" style="margin-top:10px;"><b style="color:var(--text-hi)">Read alongside:</b> ${context}</div>` : "";
+
+  if(it.info){
+    html += `<div class="info-box"><b>Event, not a data print.</b><br><br>${it.note}</div>${contextHtml}`;
+  } else {
+    html += `
+      <div class="matrix">
+        <div class="mcol hotc">
+          <h4>▲ BETTER THAN EXPECTED (HOT)</h4>
+          <div class="mrow"><span class="k">USD</span>${arrowVal(it.hot.usd)}</div>
+          <div class="mrow"><span class="k">Yields</span>${arrowVal(it.hot.yields)}</div>
+          <div class="mrow"><span class="k">Stocks</span>${arrowVal(it.hot.stocks)}</div>
+          <div class="fed-line">Fed: <b>${it.hot.fed}</b></div>
+        </div>
+        <div class="mcol coldc">
+          <h4>▼ WORSE THAN EXPECTED (COLD)</h4>
+          <div class="mrow"><span class="k">USD</span>${arrowVal(it.cold.usd)}</div>
+          <div class="mrow"><span class="k">Yields</span>${arrowVal(it.cold.yields)}</div>
+          <div class="mrow"><span class="k">Stocks</span>${arrowVal(it.cold.stocks)}</div>
+          <div class="fed-line">Fed: <b>${it.cold.fed}</b></div>
+        </div>
+      </div>
+      <div class="modal-note">${it.note}</div>
+      ${contextHtml}
+    `;
+  }
+  modalBody.innerHTML = html;
+  overlay.classList.add('show');
+}
+function closeModal(){ overlay.classList.remove('show'); }
+overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==="Escape") closeModal(); });
+
+document.getElementById('search').addEventListener('input', e=> render(e.target.value));
+
+document.getElementById('filters').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  activeImpact = chip.dataset.f;
+  render(document.getElementById('search').value);
+});
+
+render();
+</script>
+</body>
+</html>
