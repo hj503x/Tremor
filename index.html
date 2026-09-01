@@ -52,34 +52,45 @@
   .search-row input::placeholder{color:var(--text-lo);}
   .search-row input:focus{outline:none; border-color:var(--text-lo);}
 
-  .filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:30px;}
+  .filters{display:flex; gap:8px; margin-bottom:30px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px;}
+  .filters::-webkit-scrollbar{display:none;}
   .chip{
     font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase;
     padding:7px 14px; border-radius:100px; border:1px solid var(--hairline); background:var(--panel);
-    color:var(--text-mid); cursor:pointer; transition:all .15s ease; user-select:none;
+    color:var(--text-mid); cursor:pointer; transition:all .15s ease; user-select:none; flex-shrink:0;
   }
   .chip:hover{border-color:var(--text-lo);}
   .chip.active{background:var(--text-hi); color:var(--ink); border-color:var(--text-hi);}
+  .chip.compare-toggle{margin-left:auto; display:none;}
+  .chip.compare-toggle.on{background:var(--hot); color:var(--ink); border-color:var(--hot);}
+  @media (min-width:900px){ .chip.compare-toggle{display:inline-block;} }
 
-  .category{margin-bottom:40px;}
-  .cat-head{display:flex; align-items:baseline; gap:12px; margin-bottom:14px;}
+  .category{margin-bottom:40px; scroll-margin-top:180px;}
+  .cat-head{display:flex; align-items:baseline; gap:10px; margin-bottom:14px; cursor:pointer; user-select:none;}
   .cat-head h2{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:19px;}
+  .cat-count{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-lo);}
+  .cat-caret{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-lo); transition:transform .15s ease;}
+  .category.collapsed .cat-caret{transform:rotate(-90deg);}
+  .category.collapsed .grid{display:none;}
   .cat-head::after{content:''; flex:1; height:1px; background:var(--hairline);}
 
   .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:10px;}
   .card{
-    background:var(--panel); border:1px solid var(--hairline); border-radius:10px;
-    padding:16px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease;
+    position:relative; background:var(--panel); border:1px solid var(--hairline); border-radius:10px;
+    padding:16px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
   }
-  .card:hover{border-color:var(--text-lo); background:var(--panel-2);}
-  .card .name{font-size:14.5px; font-weight:600; color:var(--text-hi); margin-bottom:5px;}
+  .card:hover{border-color:var(--text-lo); background:var(--panel-2); box-shadow:0 6px 18px rgba(0,0,0,0.35); transform:translateY(-1px);}
+  .card:focus-visible{outline:2px solid var(--hot); outline-offset:2px;}
+  .card.info-type{border-style:dashed;}
+  .card .info-tag{position:absolute; top:14px; right:16px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.06em; color:var(--info);}
+  .card .name{font-size:14.5px; font-weight:600; color:var(--text-hi); margin-bottom:5px; padding-right:20px;}
   .card .sub{font-size:12px; color:var(--text-lo); line-height:1.5;}
-  .card-meta{display:flex; align-items:center; justify-content:space-between; margin-top:12px;}
-  .seismo{display:flex; align-items:flex-end; gap:2px; height:18px;}
-  .seismo i{display:block; width:3.5px; border-radius:1px; background:var(--hairline);}
+  .card-meta{display:flex; align-items:center; justify-content:space-between; margin-top:12px; pointer-events:none;}
+  .seismo{display:flex; align-items:flex-end; gap:3px; height:26px;}
+  .seismo i{display:block; width:5px; border-radius:1.5px; background:var(--hairline);}
   .badge{
-    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.05em; font-weight:700;
-    padding:4px 9px; border-radius:5px; white-space:nowrap;
+    font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.04em; font-weight:700;
+    padding:3px 7px; border-radius:5px; white-space:nowrap; opacity:0.85;
   }
   .b-veryhigh{background:var(--hot-dim); color:var(--hot);}
   .b-high{background:var(--amber-dim); color:var(--amber);}
@@ -87,7 +98,21 @@
   .b-low{background:#1B1E24; color:var(--text-lo);}
   .b-info{background:var(--info-dim); color:var(--info);}
 
-  footer{text-align:center; padding:20px 24px 50px; color:var(--text-lo); font-size:12px; font-family:'JetBrains Mono',monospace;}
+  .card-compare-box{position:absolute; top:14px; right:14px; width:18px; height:18px; border-radius:5px; border:1.5px solid var(--hairline); background:var(--ink); display:none;}
+  .compare-mode .card-compare-box{display:block;}
+  .compare-mode .card .info-tag{display:none;}
+  .card-compare-box.checked{background:var(--hot); border-color:var(--hot);}
+
+  /* card hover-reveal preview — desktop pointer devices only */
+  .card-preview{display:none;}
+  @media (hover:hover) and (min-width:900px){
+    .card-preview{
+      display:block; margin-top:10px; padding-top:10px; border-top:1px dashed var(--hairline);
+      font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-lo);
+      opacity:0; max-height:0; overflow:hidden; transition:opacity .15s ease, max-height .15s ease;
+    }
+    .card:hover .card-preview{opacity:1; max-height:60px;}
+  }
 
   section.head{margin:52px 0 18px; display:flex; align-items:baseline; gap:12px;}
   section.head h2{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:22px;}
@@ -111,6 +136,43 @@
   .prow.m .plabel{background:var(--cold-dim); color:var(--cold);}
   .plist{font-size:13.5px; color:var(--text-mid);}
 
+  .browse-layout{display:block;}
+  .cat-nav{display:none;}
+  @media (min-width:900px){
+    .browse-layout{display:grid; grid-template-columns:180px 1fr; gap:36px; align-items:start;}
+    .cat-nav{display:block; position:sticky; top:150px;}
+    .cat-nav a{display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); padding:7px 0; text-decoration:none; border-left:2px solid transparent; padding-left:12px; transition:color .15s ease, border-color .15s ease;}
+    .cat-nav a:hover{color:var(--text-hi);}
+    .cat-nav a.active{color:var(--hot); border-left-color:var(--hot);}
+    .grid{grid-template-columns:repeat(auto-fill, minmax(230px,1fr));}
+  }
+  @media (min-width:1200px){
+    .grid{grid-template-columns:repeat(auto-fill, minmax(240px,1fr));}
+  }
+
+  .back-top{
+    position:fixed; bottom:24px; right:20px; width:44px; height:44px; border-radius:50%;
+    background:var(--panel-2); border:1px solid var(--hairline); color:var(--text-hi); font-size:16px;
+    cursor:pointer; z-index:50; opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+    box-shadow:0 6px 18px rgba(0,0,0,0.4);
+  }
+  .back-top.show{opacity:1; pointer-events:all;}
+  .back-top:hover{transform:translateY(-2px);}
+
+  .compare-bar{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); z-index:60;
+    background:var(--panel-2); border:1px solid var(--hairline); border-radius:100px; padding:10px 10px 10px 20px;
+    display:flex; align-items:center; gap:14px; box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-mid);
+  }
+  .compare-bar.show{opacity:1; pointer-events:all; transform:translateX(-50%) translateY(0);}
+  .compare-bar button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; letter-spacing:0.03em;
+    padding:9px 18px; border-radius:100px; border:none; background:var(--hot); color:var(--ink); cursor:pointer;
+  }
+  .compare-bar .cb-clear{background:none; color:var(--text-lo); padding:9px 10px; font-weight:400;}
+
   @media (max-width:640px){
     .matrix{grid-template-columns:1fr;}
     .grid{grid-template-columns:1fr;}
@@ -118,19 +180,30 @@
     .prow{grid-template-columns:1fr; gap:6px;}
   }
 
-  /* ---------- MODAL ---------- */
+  /* ---------- PANEL (bottom sheet on mobile, right drawer on desktop) ---------- */
   .overlay{
-    position:fixed; inset:0; background:rgba(6,7,9,0.72); backdrop-filter:blur(3px);
-    display:flex; align-items:center; justify-content:center; z-index:100;
-    opacity:0; pointer-events:none; transition:opacity .2s ease; padding:20px;
+    position:fixed; inset:0; background:rgba(6,7,9,0.6); backdrop-filter:blur(3px);
+    z-index:100; opacity:0; pointer-events:none; transition:opacity .25s ease;
   }
   .overlay.show{opacity:1; pointer-events:all;}
   .modal{
-    background:var(--panel-2); border:1px solid var(--hairline); border-radius:14px;
-    max-width:640px; width:100%; max-height:86vh; overflow-y:auto;
-    padding:30px; transform:translateY(14px); transition:transform .2s ease;
+    background:var(--panel-2); border:1px solid var(--hairline); z-index:101;
+    position:fixed; overflow-y:auto; padding:16px 24px 32px;
+    /* mobile: bottom sheet */
+    left:0; right:0; bottom:0; max-height:88vh; border-radius:18px 18px 0 0;
+    transform:translateY(100%); transition:transform .28s cubic-bezier(.32,.72,0,1);
   }
   .overlay.show .modal{transform:translateY(0);}
+  .drag-handle{width:36px; height:4px; border-radius:3px; background:var(--hairline); margin:4px auto 16px;}
+  @media (min-width:900px){
+    .modal{
+      left:auto; top:0; right:0; bottom:0; height:100vh; max-height:none; width:440px;
+      border-radius:0; border-left:1px solid var(--hairline); border-top:none;
+      transform:translateX(100%); padding:30px;
+    }
+    .overlay.show .modal{transform:translateX(0);}
+    .drag-handle{display:none;}
+  }
   .modal-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;}
   .modal-top h2{font-family:'Fraunces',serif; font-size:25px; font-weight:600;}
   .modal-close{background:none; border:1px solid var(--hairline); color:var(--text-lo); width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; flex-shrink:0;}
@@ -158,6 +231,25 @@
   .corr-chip{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; padding:5px 11px; border-radius:6px; background:var(--panel); border:1px solid var(--hairline); color:var(--text-hi);}
   .info-box{padding:18px; background:var(--info-dim); border:1px solid #372E56; border-radius:10px; font-size:13.5px; color:var(--text-mid); line-height:1.7;}
   .info-box b{color:var(--info);}
+
+  .related-chip{
+    font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; padding:6px 12px; border-radius:6px;
+    background:var(--panel); border:1px solid var(--hairline); color:var(--text-hi); cursor:pointer; transition:border-color .15s ease;
+  }
+  .related-chip:hover{border-color:var(--hot); color:var(--hot);}
+
+  .corr-chip{cursor:pointer;}
+  .glossary-pop{
+    margin-top:8px; padding:9px 12px; background:var(--panel); border:1px solid var(--hairline); border-radius:8px;
+    font-size:12px; color:var(--text-mid); line-height:1.5; display:none;
+  }
+  .glossary-pop.show{display:block;}
+
+  .magnitude-line{font-size:12.5px; color:var(--text-lo); margin:-6px 0 18px; font-style:italic;}
+  .magnitude-line b{color:var(--text-mid); font-style:normal;}
+
+  footer{text-align:center; padding:20px 24px 50px; color:var(--text-lo); font-size:12px; font-family:'JetBrains Mono',monospace;}
+  footer .updated{display:block; margin-top:6px; opacity:0.7;}
 </style>
 </head>
 <body>
@@ -178,21 +270,7 @@
     <b>Reaction depends on the surprise, not the number.</b> A "hot" CPI that lands exactly at consensus barely moves anything — the hot/cold effect below only fires when the actual print beats or misses what the market had already priced in.
   </div>
 
-  <div class="search-row">
-    <input type="text" id="search" placeholder="Search an event… e.g. CPI, jobless claims, PMI">
-  </div>
-
-  <div class="filters" id="filters">
-    <div class="chip active" data-f="ALL">All</div>
-    <div class="chip" data-f="VERY HIGH">Very high</div>
-    <div class="chip" data-f="HIGH">High</div>
-    <div class="chip" data-f="MEDIUM">Medium</div>
-    <div class="chip" data-f="LOW">Low</div>
-  </div>
-
-  <div id="categories"></div>
-
-  <section class="head"><h2>The golden rules</h2><span>core macro mechanics</span></section>
+  <section class="head" style="margin-top:0;"><h2>The golden rules</h2><span>core macro mechanics</span></section>
   <div class="rules">
     <div class="rule-card hotr">
       <h3>Hot regime — strong economy + high inflation</h3>
@@ -211,11 +289,42 @@
     <div class="prow m"><div class="plabel">MEDIUM</div><div class="plist">GDP Growth · Consumer Confidence · JOLTS Job Openings · PPI · FOMC Minutes · Beige Book · Housing Starts · Industrial Production</div></div>
   </div>
 
-  <footer>Reactions describe typical, historically consistent directional effects — not a guarantee of any single release's outcome.</footer>
+  <section class="head"><h2>Browse events</h2><span id="kbdHint" style="display:none;">press / to search</span></section>
+
+  <div class="search-row">
+    <input type="text" id="search" placeholder="Search an event… e.g. CPI, jobless claims, PMI">
+  </div>
+
+  <div class="filters" id="filters">
+    <div class="chip active" data-f="ALL">All</div>
+    <div class="chip" data-f="VERY HIGH">Very high</div>
+    <div class="chip" data-f="HIGH">High</div>
+    <div class="chip" data-f="MEDIUM">Medium</div>
+    <div class="chip" data-f="LOW">Low</div>
+    <div class="chip compare-toggle" id="compareToggle">Compare mode</div>
+  </div>
+
+  <div class="browse-layout">
+    <nav class="cat-nav" id="catNav"></nav>
+    <div id="categories"></div>
+  </div>
+
+  <footer>Reactions describe typical, historically consistent directional effects — not a guarantee of any single release's outcome.<span class="updated">Data last reviewed: 1 Sep 2026 — edit this line by hand whenever you revise the matrix.</span></footer>
 </main>
 
+<button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+<div class="compare-bar" id="compareBar">
+  <span id="compareCount">0 selected</span>
+  <button class="cb-clear" id="compareClear">Clear</button>
+  <button id="compareOpen">Compare →</button>
+</div>
+
 <div class="overlay" id="overlay">
-  <div class="modal" id="modalBody"></div>
+  <div class="modal" id="modalBody">
+    <div class="drag-handle" id="dragHandle"></div>
+    <div id="modalInner"></div>
+  </div>
 </div>
 
 <script>
@@ -462,6 +571,7 @@ function seismoBars(impact){
 }
 
 const catEl = document.getElementById('categories');
+const catNav = document.getElementById('catNav');
 
 function arrowVal(v){
   if(v==="UP") return `<span class="v up">↑ UP</span>`;
@@ -469,111 +579,348 @@ function arrowVal(v){
   return `<span class="v" style="color:var(--text-mid)">${v}</span>`;
 }
 
+function quickPreview(it){
+  if(it.info) return "Event, not a data print — tone-trading only.";
+  return `Hot: USD ${it.hot.usd} · Yields ${it.hot.yields} · Stocks ${it.hot.stocks}`;
+}
+
+function slugify(name){
+  return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+}
+function findEventByName(name){
+  return DATA.flatMap(g=>g.items).find(it=>it.name===name);
+}
+
+function isCollapsed(catName){
+  try{ return localStorage.getItem('tremor-collapsed-'+catName) === '1'; }catch(e){ return false; }
+}
+function setCollapsed(catName, val){
+  try{ localStorage.setItem('tremor-collapsed-'+catName, val ? '1' : '0'); }catch(e){}
+}
+
 let activeImpact = "ALL";
+let compareMode = false;
+let selectedCompare = []; // array of event names
 
 function render(filter=""){
   catEl.innerHTML = '';
+  catNav.innerHTML = '';
+  catEl.classList.toggle('compare-mode', compareMode);
   const f = filter.trim().toLowerCase();
-  DATA.forEach(group=>{
+  DATA.forEach((group, gi)=>{
     const items = group.items.filter(it => {
       const matchesText = !f || it.name.toLowerCase().includes(f) || (it.sub||"").toLowerCase().includes(f);
       const matchesImpact = activeImpact === "ALL" || it.impact === activeImpact;
       return matchesText && matchesImpact;
     });
     if(items.length === 0) return;
+
+    const slug = 'cat-' + gi;
+    const navLink = document.createElement('a');
+    navLink.href = '#' + slug;
+    navLink.textContent = group.cat;
+    navLink.addEventListener('click', e=>{
+      e.preventDefault();
+      document.getElementById(slug).scrollIntoView({behavior:'smooth', block:'start'});
+    });
+    catNav.appendChild(navLink);
+
+    const collapsed = !f && isCollapsed(group.cat); // never collapse while searching
     const block = document.createElement('div');
-    block.className = 'category';
-    block.innerHTML = `<div class="cat-head"><h2>${group.cat}</h2></div><div class="grid"></div>`;
+    block.className = 'category' + (collapsed ? ' collapsed' : '');
+    block.id = slug;
+    block.innerHTML = `<div class="cat-head"><span class="cat-caret">▾</span><h2>${group.cat}</h2><span class="cat-count">${items.length}</span></div><div class="grid"></div>`;
+    block.querySelector('.cat-head').addEventListener('click', ()=>{
+      const nowCollapsed = block.classList.toggle('collapsed');
+      setCollapsed(group.cat, nowCollapsed);
+    });
     const grid = block.querySelector('.grid');
     items.forEach(it=>{
       const card = document.createElement('div');
-      card.className = 'card';
+      card.className = 'card' + (it.info ? ' info-type' : '');
+      card.tabIndex = 0;
+      card.setAttribute('role','button');
+      const checked = selectedCompare.includes(it.name);
       card.innerHTML = `
+        ${it.info ? '<span class="info-tag">EVENT</span>' : ''}
+        <div class="card-compare-box${checked?' checked':''}"></div>
         <div class="name">${it.name}</div>
         <div class="sub">${it.sub||""}</div>
         <div class="card-meta">
           <div class="seismo">${seismoBars(it.impact)}</div>
           <div class="badge ${IMPACT_CLASS[it.impact]}">${it.impact}</div>
         </div>
+        <div class="card-preview">${quickPreview(it)}</div>
       `;
-      card.addEventListener('click', ()=>openModal(it));
+      card.addEventListener('click', ()=>{
+        if(compareMode){ toggleCompare(it.name); render(document.getElementById('search').value); }
+        else openModal(it);
+      });
+      card.addEventListener('keydown', e=>{
+        if(e.key==="Enter" || e.key===" "){ e.preventDefault(); card.click(); }
+      });
       grid.appendChild(card);
     });
     catEl.appendChild(block);
   });
+  setupArrowNav();
+}
+
+function toggleCompare(name){
+  const i = selectedCompare.indexOf(name);
+  if(i>-1) selectedCompare.splice(i,1);
+  else if(selectedCompare.length < 3) selectedCompare.push(name);
+  updateCompareBar();
+}
+function updateCompareBar(){
+  const bar = document.getElementById('compareBar');
+  document.getElementById('compareCount').textContent = `${selectedCompare.length} selected`;
+  bar.classList.toggle('show', compareMode && selectedCompare.length >= 2);
 }
 
 const overlay = document.getElementById('overlay');
-const modalBody = document.getElementById('modalBody');
+const modalPanel = document.getElementById('modalBody');
+const modalInner = document.getElementById('modalInner');
 
-function openModal(it){
+// Events commonly checked together — rendered as clickable jump-to chips in the panel.
+const RELATED = {
+  "CPI & Core CPI": ["PPI & Core PPI","PCE Price Index & Core PCE"],
+  "PPI & Core PPI": ["CPI & Core CPI"],
+  "PCE Price Index & Core PCE": ["CPI & Core CPI","FOMC Rate Decision"],
+  "Non-Farm Payrolls (NFP)": ["Average Hourly Earnings","Unemployment Rate"],
+  "Unemployment Rate": ["Non-Farm Payrolls (NFP)"],
+  "Weekly Initial Jobless Claims": ["Non-Farm Payrolls (NFP)"],
+  "Average Hourly Earnings": ["Non-Farm Payrolls (NFP)"],
+  "JOLTS Job Openings": ["Non-Farm Payrolls (NFP)"],
+  "GDP (Advance / Preliminary / Final)": ["Retail Sales & Core Retail Sales"],
+  "Retail Sales & Core Retail Sales": ["CPI & Core CPI"],
+  "ISM Manufacturing PMI": ["ISM Services PMI"],
+  "ISM Services PMI": ["ISM Manufacturing PMI"],
+  "FOMC Rate Decision": ["Fed Chair Press Conference / Testimony","FOMC Minutes"],
+  "Fed Chair Press Conference / Testimony": ["FOMC Rate Decision","CPI & Core CPI"],
+  "FOMC Minutes": ["FOMC Rate Decision"],
+  "Housing Starts & Building Permits": ["NAHB Home Builder Confidence Index"],
+};
+
+// Short definitions for the correlated instruments shown as chips.
+const GLOSSARY = {
+  "DXY": "US Dollar Index — USD's value against a basket of six major currencies.",
+  "EURUSD": "Euro vs US Dollar — the most traded currency pair.",
+  "XAUUSD": "Gold priced in US Dollars.",
+  "US10Y": "10-Year US Treasury yield — the benchmark long-term interest rate.",
+  "SPX": "S&P 500 — broad US stock market index.",
+  "BTCUSD": "Bitcoin priced in US Dollars.",
+};
+
+// Rough, approximate sense of typical move size — general reference only, not a promise.
+const MAGNITUDE = {
+  "Non-Farm Payrolls (NFP)": "Often the single largest scheduled move of the month.",
+  "CPI & Core CPI": "Regularly among the largest moves of the month, rivaling NFP.",
+  "FOMC Rate Decision": "Can be the largest move of the quarter, especially on a surprise or guidance shift.",
+  "PCE Price Index & Core PCE": "Usually smaller than CPI's reaction since CPI already set the tone weeks earlier.",
+  "Fed Chair Press Conference / Testimony": "Variable — can spike sharply on any unscripted remark.",
+  "PPI & Core PPI": "Typically a smaller, shorter-lived move than CPI.",
+  "Retail Sales & Core Retail Sales": "Moderate — noticeable but rarely a headline mover on its own.",
+  "Existing Home Sales": "Usually a minor blip, rarely more.",
+  "New Home Sales": "Usually a minor blip, rarely more.",
+  "Pending Home Sales": "Usually a minor blip, rarely more.",
+  "Case-Shiller Home Price Index": "Rarely more than a blip — lagged data markets have often already priced in.",
+  "Trade Balance": "Rarely more than a blip on its own.",
+};
+
+function matrixBlock(it){
+  return `
+    <div class="matrix">
+      <div class="mcol hotc">
+        <h4>▲ BETTER THAN EXPECTED (HOT)</h4>
+        <div class="mrow"><span class="k">USD</span>${arrowVal(it.hot.usd)}</div>
+        <div class="mrow"><span class="k">Yields</span>${arrowVal(it.hot.yields)}</div>
+        <div class="mrow"><span class="k">Stocks</span>${arrowVal(it.hot.stocks)}</div>
+        <div class="fed-line">Fed: <b>${it.hot.fed}</b></div>
+      </div>
+      <div class="mcol coldc">
+        <h4>▼ WORSE THAN EXPECTED (COLD)</h4>
+        <div class="mrow"><span class="k">USD</span>${arrowVal(it.cold.usd)}</div>
+        <div class="mrow"><span class="k">Yields</span>${arrowVal(it.cold.yields)}</div>
+        <div class="mrow"><span class="k">Stocks</span>${arrowVal(it.cold.stocks)}</div>
+        <div class="fed-line">Fed: <b>${it.cold.fed}</b></div>
+      </div>
+    </div>
+  `;
+}
+
+function eventDetailHtml(it, withHeader=true){
   const pairs = PAIRS[it.name];
   const session = SESSION[it.name];
   const context = CONTEXT[it.name];
+  const related = RELATED[it.name];
+  const magnitude = MAGNITUDE[it.name];
 
   const corrHtml = pairs ? `
     <div class="corr-section">
-      <div class="corr-label">Reacts hardest in</div>
-      <div class="corr-chips">${pairs.map(p=>`<div class="corr-chip">${p}</div>`).join('')}</div>
+      <div class="corr-label">Reacts hardest in <span style="opacity:0.6;">(tap for definition)</span></div>
+      <div class="corr-chips">${pairs.map(p=>`<div class="corr-chip" data-glossary="${p}">${p}</div>`).join('')}</div>
+      <div class="glossary-pop"></div>
+    </div>
+  ` : "";
+  const sessionHtml = session ? `<div class="corr-section"><div class="corr-label">Typical timing</div><div style="font-size:13px;color:var(--text-mid)">${session}</div></div>` : "";
+  const contextHtml = context ? `<div class="modal-note" style="margin-top:10px;"><b style="color:var(--text-hi)">Read alongside:</b> ${context}</div>` : "";
+  const magnitudeHtml = magnitude ? `<div class="magnitude-line">Typical size: <b>${magnitude}</b></div>` : "";
+  const relatedHtml = related ? `
+    <div class="corr-section">
+      <div class="corr-label">Jump to related event</div>
+      <div class="corr-chips">${related.map(name=>`<div class="related-chip" data-jump="${name}">${name} →</div>`).join('')}</div>
     </div>
   ` : "";
 
-  const sessionHtml = session ? `<div class="corr-section"><div class="corr-label">Typical timing</div><div style="font-size:13px;color:var(--text-mid)">${session}</div></div>` : "";
-
-  let html = `
+  let html = withHeader ? `
     <div class="modal-top">
       <h2>${it.name}</h2>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      ${withHeader==='single' ? `<button class="modal-close" onclick="closeModal()">✕</button>` : ''}
     </div>
     <div class="modal-meta">${it.sub||""} · <span class="badge ${IMPACT_CLASS[it.impact]}" style="margin-left:4px;">${it.impact}</span></div>
-    ${sessionHtml}
-    ${corrHtml}
-  `;
-  const contextHtml = context ? `<div class="modal-note" style="margin-top:10px;"><b style="color:var(--text-hi)">Read alongside:</b> ${context}</div>` : "";
+    ${magnitudeHtml}
+  ` : '';
+  html += `${sessionHtml}${corrHtml}`;
 
   if(it.info){
     html += `<div class="info-box"><b>Event, not a data print.</b><br><br>${it.note}</div>${contextHtml}`;
   } else {
-    html += `
-      <div class="matrix">
-        <div class="mcol hotc">
-          <h4>▲ BETTER THAN EXPECTED (HOT)</h4>
-          <div class="mrow"><span class="k">USD</span>${arrowVal(it.hot.usd)}</div>
-          <div class="mrow"><span class="k">Yields</span>${arrowVal(it.hot.yields)}</div>
-          <div class="mrow"><span class="k">Stocks</span>${arrowVal(it.hot.stocks)}</div>
-          <div class="fed-line">Fed: <b>${it.hot.fed}</b></div>
-        </div>
-        <div class="mcol coldc">
-          <h4>▼ WORSE THAN EXPECTED (COLD)</h4>
-          <div class="mrow"><span class="k">USD</span>${arrowVal(it.cold.usd)}</div>
-          <div class="mrow"><span class="k">Yields</span>${arrowVal(it.cold.yields)}</div>
-          <div class="mrow"><span class="k">Stocks</span>${arrowVal(it.cold.stocks)}</div>
-          <div class="fed-line">Fed: <b>${it.cold.fed}</b></div>
-        </div>
-      </div>
-      <div class="modal-note">${it.note}</div>
-      ${contextHtml}
-    `;
+    html += `${matrixBlock(it)}<div class="modal-note">${it.note}</div>${contextHtml}`;
   }
-  modalBody.innerHTML = html;
+  html += relatedHtml;
+  return html;
+}
+
+function wireDetailInteractions(container){
+  container.querySelectorAll('.corr-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const term = chip.dataset.glossary;
+      const pop = chip.closest('.corr-section').querySelector('.glossary-pop');
+      if(!pop) return;
+      const def = GLOSSARY[term];
+      if(pop.classList.contains('show') && pop.dataset.term === term){
+        pop.classList.remove('show');
+      } else {
+        pop.innerHTML = def ? `<b style="color:var(--text-hi)">${term}</b> — ${def}` : `No definition available for ${term}.`;
+        pop.dataset.term = term;
+        pop.classList.add('show');
+      }
+    });
+  });
+  container.querySelectorAll('.related-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const target = findEventByName(chip.dataset.jump);
+      if(target) openModal(target);
+    });
+  });
+}
+
+function openModal(it){
+  modalInner.innerHTML = `<button class="modal-close" onclick="closeModal()" style="float:right;">✕</button>` + eventDetailHtml(it, true);
+  wireDetailInteractions(modalInner);
+  overlay.classList.add('show');
+  try{ history.replaceState(null, '', '#' + slugify(it.name)); }catch(e){}
+}
+
+function openCompare(){
+  const items = selectedCompare.map(name => findEventByName(name)).filter(Boolean);
+  let html = `<div class="modal-top"><h2>Compare (${items.length})</h2><button class="modal-close" onclick="closeModal()">✕</button></div>`;
+  items.forEach((it,i)=>{
+    html += `<div style="margin-top:${i===0?0:28}px; padding-top:${i===0?0:20}px; border-top:${i===0?'none':'1px solid var(--hairline)'}">`;
+    html += eventDetailHtml(it, 'sub');
+    html += `</div>`;
+  });
+  modalInner.innerHTML = html;
+  wireDetailInteractions(modalInner);
   overlay.classList.add('show');
 }
-function closeModal(){ overlay.classList.remove('show'); }
+
+function closeModal(){
+  overlay.classList.remove('show');
+  if(location.hash){ try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){} }
+}
 overlay.addEventListener('click', e=>{ if(e.target===overlay) closeModal(); });
 document.addEventListener('keydown', e=>{ if(e.key==="Escape") closeModal(); });
 
-document.getElementById('search').addEventListener('input', e=> render(e.target.value));
+/* swipe-to-dismiss on mobile bottom sheet */
+(function(){
+  let startY=null, currentY=0, dragging=false;
+  const handle = document.getElementById('dragHandle');
+  function start(e){ dragging=true; startY = (e.touches?e.touches[0].clientY:e.clientY); modalPanel.style.transition='none'; }
+  function move(e){
+    if(!dragging) return;
+    currentY = (e.touches?e.touches[0].clientY:e.clientY) - startY;
+    if(currentY>0) modalPanel.style.transform = `translateY(${currentY}px)`;
+  }
+  function end(){
+    if(!dragging) return;
+    dragging=false;
+    modalPanel.style.transition='';
+    if(currentY > 110){ closeModal(); }
+    modalPanel.style.transform='';
+    currentY=0;
+  }
+  handle.addEventListener('touchstart', start);
+  handle.addEventListener('touchmove', move);
+  handle.addEventListener('touchend', end);
+})();
+
+/* search + filters */
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', e=> render(e.target.value));
 
 document.getElementById('filters').addEventListener('click', e=>{
   const chip = e.target.closest('.chip');
-  if(!chip) return;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  if(!chip || chip.id==='compareToggle') return;
+  document.querySelectorAll('.chip').forEach(c=>{ if(c.id!=='compareToggle') c.classList.remove('active'); });
   chip.classList.add('active');
   activeImpact = chip.dataset.f;
-  render(document.getElementById('search').value);
+  render(searchInput.value);
 });
 
+/* compare mode */
+document.getElementById('compareToggle').addEventListener('click', ()=>{
+  compareMode = !compareMode;
+  document.getElementById('compareToggle').classList.toggle('on', compareMode);
+  if(!compareMode) selectedCompare = [];
+  updateCompareBar();
+  render(searchInput.value);
+});
+document.getElementById('compareClear').addEventListener('click', ()=>{ selectedCompare=[]; updateCompareBar(); render(searchInput.value); });
+document.getElementById('compareOpen').addEventListener('click', openCompare);
+
+/* back to top */
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', ()=>{ backTop.classList.toggle('show', window.scrollY > 700); });
+backTop.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+/* keyboard: "/" focuses search, arrow keys move between cards */
+document.addEventListener('keydown', e=>{
+  if(e.key === '/' && document.activeElement !== searchInput){
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+function setupArrowNav(){
+  const cards = Array.from(document.querySelectorAll('.card'));
+  cards.forEach((card, i)=>{
+    card.addEventListener('keydown', e=>{
+      if(e.key==='ArrowRight' || e.key==='ArrowDown'){ e.preventDefault(); (cards[i+1]||cards[0]).focus(); }
+      if(e.key==='ArrowLeft' || e.key==='ArrowUp'){ e.preventDefault(); (cards[i-1]||cards[cards.length-1]).focus(); }
+    });
+  });
+}
+
 render();
+
+/* deep link — open a specific event if the URL hash matches its slug */
+(function(){
+  const hash = location.hash.replace('#','');
+  if(!hash || hash.startsWith('cat-')) return;
+  const match = DATA.flatMap(g=>g.items).find(it => slugify(it.name) === hash);
+  if(match) openModal(match);
+})();
 </script>
 </body>
 </html>
