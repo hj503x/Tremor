@@ -44,6 +44,55 @@
   }
   .surprise-note b{color:var(--amber);}
 
+  .view-toggle{display:flex; gap:8px; margin-bottom:30px; background:var(--panel); border:1px solid var(--hairline); border-radius:100px; padding:4px; width:fit-content;}
+  .view-toggle button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em; text-transform:uppercase; font-weight:600;
+    padding:8px 18px; border-radius:100px; border:none; background:transparent; color:var(--text-lo); cursor:pointer; transition:all .15s ease;
+  }
+  .view-toggle button.active{background:var(--text-hi); color:var(--ink);}
+
+  .cal-pinned{
+    display:flex; align-items:center; gap:12px; padding:14px 16px; margin-bottom:16px;
+    background:var(--panel); border:1px dashed var(--hairline); border-radius:10px;
+    font-size:13px; color:var(--text-mid);
+  }
+  .cal-pinned b{color:var(--text-hi);}
+  .cal-tba{
+    padding:14px 16px; margin-bottom:30px; background:var(--info-dim); border:1px solid #372E56; border-radius:10px;
+    font-size:13px; color:var(--text-mid); line-height:1.6;
+  }
+  .cal-tba b{color:var(--info);}
+
+  .cal-layout{display:block;}
+  .cal-nav{display:none;}
+  @media (min-width:900px){
+    .cal-layout{display:grid; grid-template-columns:150px 1fr; gap:36px; align-items:start;}
+    .cal-nav{display:block; position:sticky; top:150px;}
+    .cal-nav a{display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); padding:7px 0; text-decoration:none; border-left:2px solid transparent; padding-left:12px; transition:color .15s ease, border-color .15s ease;}
+    .cal-nav a:hover{color:var(--text-hi);}
+    .cal-nav a.active{color:var(--hot); border-left-color:var(--hot);}
+  }
+
+  .cal-month{margin-bottom:36px; scroll-margin-top:180px;}
+  .cal-month-head{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:19px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--hairline);}
+
+  .cal-row{
+    display:grid; grid-template-columns:80px 1fr auto; align-items:center; gap:14px;
+    padding:12px 10px; border-bottom:1px solid var(--hairline); cursor:pointer; transition:background .15s ease;
+  }
+  .cal-row:hover{background:var(--panel);}
+  .cal-row.today{background:var(--hot-dim);}
+  .cal-row.soon .cal-date b{color:var(--amber);}
+  .cal-date{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); line-height:1.4;}
+  .cal-date b{display:block; font-size:15px; color:var(--text-hi); font-weight:700;}
+  .cal-name{font-size:14px; font-weight:600; color:var(--text-hi);}
+  .cal-period{font-size:11.5px; color:var(--text-lo); margin-top:2px;}
+  .cal-rulenote{font-size:10px; color:var(--text-lo); font-style:italic; margin-top:2px;}
+
+  @media (max-width:640px){
+    .cal-row{grid-template-columns:64px 1fr auto;}
+  }
+
   .search-row{margin-bottom:30px;}
   .search-row input{
     width:100%; background:var(--panel); border:1px solid var(--hairline); border-radius:10px;
@@ -76,16 +125,18 @@
 
   .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(270px,1fr)); gap:10px;}
   .card{
-    position:relative; background:var(--panel); border:1px solid var(--hairline); border-radius:10px;
-    padding:16px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
+    position:relative; background:var(--panel); border:1px solid var(--hairline); border-left:3px solid var(--hairline); border-radius:10px;
+    padding:20px 20px 20px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
   }
   .card:hover{border-color:var(--text-lo); background:var(--panel-2); box-shadow:0 6px 18px rgba(0,0,0,0.35); transform:translateY(-1px);}
+  .card:hover{border-left-width:3px;} /* keep accent width stable on hover */
   .card:focus-visible{outline:2px solid var(--hot); outline-offset:2px;}
-  .card.info-type{border-style:dashed;}
+  .card.info-type{border-style:dashed; border-left-style:solid;}
   .card .info-tag{position:absolute; top:14px; right:16px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.06em; color:var(--info);}
-  .card .name{font-size:14.5px; font-weight:600; color:var(--text-hi); margin-bottom:5px; padding-right:20px;}
-  .card .sub{font-size:12px; color:var(--text-lo); line-height:1.5;}
-  .card-meta{display:flex; align-items:center; justify-content:space-between; margin-top:12px; pointer-events:none;}
+  .card .name{font-family:'Fraunces',serif; font-weight:600; font-size:16.5px; margin-bottom:8px; padding-right:20px; line-height:1.3;}
+  .card .sub{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-mid); line-height:1.7;}
+  .card-body{flex:1; min-width:0;}
+  .card-meta{display:flex; align-items:center; justify-content:space-between; margin-top:14px; pointer-events:none;}
   .seismo{display:flex; align-items:flex-end; gap:3px; height:26px;}
   .seismo i{display:block; width:5px; border-radius:1.5px; background:var(--hairline);}
   .badge{
@@ -144,10 +195,23 @@
     .cat-nav a{display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); padding:7px 0; text-decoration:none; border-left:2px solid transparent; padding-left:12px; transition:color .15s ease, border-color .15s ease;}
     .cat-nav a:hover{color:var(--text-hi);}
     .cat-nav a.active{color:var(--hot); border-left-color:var(--hot);}
-    .grid{grid-template-columns:repeat(auto-fill, minmax(230px,1fr));}
+
+    /* desktop: horizontal list rows instead of a card grid — accent border · name/sub · badge */
+    .grid{display:flex; flex-direction:column; gap:10px;}
+    .card{display:flex; align-items:center; gap:18px; padding:18px 22px 18px 20px; min-height:76px;}
+    .card .name{margin-bottom:4px; padding-right:0; font-size:16px;}
+    .card .sub{white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12.5px;}
+    .card-meta{flex-direction:row-reverse; margin-top:0; flex-shrink:0; gap:16px;}
+    .card .badge{font-size:11.5px; padding:8px 16px; opacity:1;}
+    .card .seismo{height:22px;}
+    .card .info-tag{position:static; margin-right:4px;}
+    .card .card-compare-box{position:static; margin-right:2px;}
+    .compare-mode .card{padding-left:16px;}
+    .card-preview{border-top:none !important; margin-top:2px !important; padding-top:0 !important;}
+    .card:hover .card-preview{max-height:40px;}
   }
   @media (min-width:1200px){
-    .grid{grid-template-columns:repeat(auto-fill, minmax(240px,1fr));}
+    .card .sub{max-width:420px;}
   }
 
   .back-top{
@@ -291,22 +355,38 @@
 
   <section class="head"><h2>Browse events</h2><span id="kbdHint" style="display:none;">press / to search</span></section>
 
-  <div class="search-row">
-    <input type="text" id="search" placeholder="Search an event… e.g. CPI, jobless claims, PMI">
+  <div class="view-toggle" id="viewToggle">
+    <button class="active" data-view="reference">Reference</button>
+    <button data-view="calendar">Calendar</button>
   </div>
 
-  <div class="filters" id="filters">
-    <div class="chip active" data-f="ALL">All</div>
-    <div class="chip" data-f="VERY HIGH">Very high</div>
-    <div class="chip" data-f="HIGH">High</div>
-    <div class="chip" data-f="MEDIUM">Medium</div>
-    <div class="chip" data-f="LOW">Low</div>
-    <div class="chip compare-toggle" id="compareToggle">Compare mode</div>
+  <div id="referenceView">
+    <div class="search-row">
+      <input type="text" id="search" placeholder="Search an event… e.g. CPI, jobless claims, PMI">
+    </div>
+
+    <div class="filters" id="filters">
+      <div class="chip active" data-f="ALL">All</div>
+      <div class="chip" data-f="VERY HIGH">Very high</div>
+      <div class="chip" data-f="HIGH">High</div>
+      <div class="chip" data-f="MEDIUM">Medium</div>
+      <div class="chip" data-f="LOW">Low</div>
+      <div class="chip compare-toggle" id="compareToggle">Compare mode</div>
+    </div>
+
+    <div class="browse-layout">
+      <nav class="cat-nav" id="catNav"></nav>
+      <div id="categories"></div>
+    </div>
   </div>
 
-  <div class="browse-layout">
-    <nav class="cat-nav" id="catNav"></nav>
-    <div id="categories"></div>
+  <div id="calendarView" style="display:none;">
+    <div class="cal-pinned">🔁 <span><b>Weekly Initial Jobless Claims</b> — every Thursday, 8:30am ET (not listed individually below)</span></div>
+    <div class="cal-tba"><b>Not on a fixed public schedule:</b> Fed speeches and testimony are announced only 1–2 weeks ahead by the Fed itself — shown live above once the FRED/RSS worker is connected, otherwise not listed below. Existing Home Sales, Pending Home Sales, and NAHB don't publish a fixed weekday rule either — all of these stay in the Reference tab, just without a calendar date.</div>
+    <div class="cal-layout">
+      <nav class="cal-nav" id="calNav"></nav>
+      <div id="calMonths"></div>
+    </div>
   </div>
 
   <footer>Reactions describe typical, historically consistent directional effects — not a guarantee of any single release's outcome.<span class="updated">Data last reviewed: 1 Sep 2026 — edit this line by hand whenever you revise the matrix.</span></footer>
@@ -602,6 +682,11 @@ let activeImpact = "ALL";
 let compareMode = false;
 let selectedCompare = []; // array of event names
 
+// Matches the golden-rule-card treatment: colored left border + colored serif title per impact tier.
+function accentColor(impact){
+  return impact==="VERY HIGH" ? "var(--hot)" : impact==="HIGH" ? "var(--amber)" : impact==="MEDIUM" ? "var(--cold)" : impact==="INFO" ? "var(--info)" : "var(--text-lo)";
+}
+
 function render(filter=""){
   catEl.innerHTML = '';
   catNav.innerHTML = '';
@@ -640,17 +725,20 @@ function render(filter=""){
       card.className = 'card' + (it.info ? ' info-type' : '');
       card.tabIndex = 0;
       card.setAttribute('role','button');
+      card.style.borderLeftColor = accentColor(it.impact);
       const checked = selectedCompare.includes(it.name);
       card.innerHTML = `
         ${it.info ? '<span class="info-tag">EVENT</span>' : ''}
         <div class="card-compare-box${checked?' checked':''}"></div>
-        <div class="name">${it.name}</div>
-        <div class="sub">${it.sub||""}</div>
+        <div class="card-body">
+          <div class="name" style="color:${accentColor(it.impact)};">${it.name}</div>
+          <div class="sub">${it.sub||""}</div>
+          <div class="card-preview">${quickPreview(it)}</div>
+        </div>
         <div class="card-meta">
           <div class="seismo">${seismoBars(it.impact)}</div>
           <div class="badge ${IMPACT_CLASS[it.impact]}">${it.impact}</div>
         </div>
-        <div class="card-preview">${quickPreview(it)}</div>
       `;
       card.addEventListener('click', ()=>{
         if(compareMode){ toggleCompare(it.name); render(document.getElementById('search').value); }
@@ -911,6 +999,314 @@ function setupArrowNav(){
     });
   });
 }
+
+/* ============================================================
+   CALENDAR VIEW — release dates for 2026
+   Sourced from official schedules: BLS (bls.gov/schedule), BEA
+   (bea.gov/news/schedule), Census Bureau, and the Federal Reserve
+   (federalreserve.gov/monetarypolicy/fomccalendars.htm).
+   Hardcoded lists = confirmed official dates. Computed rules =
+   well-established, near-permanent release-day conventions (e.g.
+   "ISM Manufacturing = first business day of the month"), applied
+   here to future 2026 dates. Extend into 2027 by hand once agencies
+   publish next year's schedule (typically each September).
+   ============================================================ */
+
+// day-of-month for each indicator, Jan..Dec 2026 (index 0 = Jan)
+const HARD_DATES_2026 = {
+  "CPI & Core CPI":                       [13,11,11,10,12,10,14,12,11,14,10,10],
+  "PPI & Core PPI":                       [14,12,12,14,13,11,15,13,10,15,13,15],
+  "Non-Farm Payrolls (NFP)":              [9,6,6,3,8,5,2,7,4,2,6,4],
+  "Unemployment Rate":                    [9,6,6,3,8,5,2,7,4,2,6,4],
+  "Average Hourly Earnings":              [9,6,6,3,8,5,2,7,4,2,6,4],
+  "PCE Price Index & Core PCE":           [29,26,27,30,28,25,30,26,30,29,25,23],
+  "Personal Income & Personal Spending":  [29,26,27,30,28,25,30,26,30,29,25,23],
+  "Retail Sales & Core Retail Sales":     [15,17,16,16,14,17,16,14,16,15,17,16],
+  "Housing Starts & Building Permits":    [21,18,17,17,19,16,17,18,17,20,18,17],
+  "New Home Sales":                       [27,25,24,23,27,24,24,25,24,27,25,23],
+  "Durable Goods Orders":                 [28,26,25,24,28,25,27,26,25,27,25,23],
+  "Industrial Production & Capacity Utilization": [16,18,16,16,15,15,17,18,18,16,17,16],
+  "Trade Balance":                        [8,5,5,2,5,9,7,4,3,6,4,8],
+  "Import / Export Price Index":          [15,18,17,15,14,16,17,18,16,16,17,17],
+};
+
+// GDP: advance estimate only, one per quarter (2026)
+const GDP_DATES_2026 = [
+  {date:"2026-01-29", period:"Q4 2025, advance"},
+  {date:"2026-04-30", period:"Q1 2026, advance"},
+  {date:"2026-07-30", period:"Q2 2026, advance"},
+  {date:"2026-10-29", period:"Q3 2026, advance"},
+];
+
+// JOLTS: computed as first Tuesday of the month, with one confirmed
+// holiday-driven exception (Sep 2026 pushed to the last Tuesday because
+// Sep 1's slot was used for July's delayed data).
+const JOLTS_OVERRIDES_2026 = { 8: 29 }; // month index (0=Jan) -> day override
+
+// FOMC decision day (day 2 of each 2-day meeting), 2pm ET
+const FOMC_DATES_2026 = ["2026-01-28","2026-03-18","2026-04-29","2026-06-17","2026-07-29","2026-09-16","2026-10-28","2026-12-09"];
+
+// Beige Book: 2 Wednesdays before each FOMC decision
+const BEIGE_DATES_2026 = ["2026-01-14","2026-03-04","2026-04-15","2026-06-03","2026-07-15","2026-09-02","2026-10-14","2026-11-25"];
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function iso(y,m,d){ return `${y}-${pad2(m+1)}-${pad2(d)}`; } // m is 0-indexed
+
+function nthWeekdayOfMonth(year, month, weekday, n){ // month 0-indexed, weekday 0=Sun..6=Sat
+  let count = 0;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  for(let d=1; d<=daysInMonth; d++){
+    if(new Date(year, month, d).getDay() === weekday){
+      count++;
+      if(count === n) return d;
+    }
+  }
+  return null;
+}
+function lastWeekdayOfMonth(year, month, weekday){
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  for(let d=daysInMonth; d>=1; d--){
+    if(new Date(year, month, d).getDay() === weekday) return d;
+  }
+  return null;
+}
+function nthBusinessDay(year, month, n){ // Mon-Fri only, no holiday awareness
+  let count = 0;
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  for(let d=1; d<=daysInMonth; d++){
+    const dow = new Date(year, month, d).getDay();
+    if(dow !== 0 && dow !== 6){
+      count++;
+      if(count === n) return d;
+    }
+  }
+  return null;
+}
+
+function buildCalendarEvents(year){
+  const events = [];
+
+  Object.entries(HARD_DATES_2026).forEach(([name, days])=>{
+    days.forEach((day, m)=> events.push({date: iso(year, m, day), name, ruleNote: null}));
+  });
+  GDP_DATES_2026.forEach(g => events.push({date: g.date, name: "GDP (Advance / Preliminary / Final)", period: g.period, ruleNote: null}));
+  FOMC_DATES_2026.forEach(d => events.push({date: d, name: "FOMC Rate Decision", ruleNote: null}));
+  BEIGE_DATES_2026.forEach(d => events.push({date: d, name: "Fed Beige Book", ruleNote: "Computed: 2 Wednesdays before FOMC"}));
+  FOMC_DATES_2026.forEach(d => {
+    const dt = new Date(d + 'T12:00:00');
+    dt.setDate(dt.getDate() + 21);
+    events.push({date: iso(dt.getFullYear(), dt.getMonth(), dt.getDate()), name:"FOMC Minutes", ruleNote:"Computed: 3 weeks after the FOMC decision"});
+  });
+
+  for(let m=0; m<12; m++){
+    const jday = JOLTS_OVERRIDES_2026[m] ?? nthWeekdayOfMonth(year, m, 2, 1); // 2 = Tuesday
+    events.push({date: iso(year,m,jday), name:"JOLTS Job Openings", ruleNote: JOLTS_OVERRIDES_2026[m] ? "Confirmed (shifted from usual first Tuesday)" : "Computed: usual first Tuesday of month"});
+
+    events.push({date: iso(year,m,nthBusinessDay(year,m,1)), name:"ISM Manufacturing PMI", ruleNote:"Computed: first business day of month"});
+    events.push({date: iso(year,m,nthBusinessDay(year,m,3)), name:"ISM Services PMI", ruleNote:"Computed: third business day of month"});
+    events.push({date: iso(year,m,nthWeekdayOfMonth(year,m,5,2)), name:"U. Michigan Consumer Sentiment", period:"Preliminary", ruleNote:"Computed: second Friday of month"});
+    events.push({date: iso(year,m,nthWeekdayOfMonth(year,m,5,4)), name:"U. Michigan Consumer Sentiment", period:"Final", ruleNote:"Computed: fourth Friday of month"});
+    events.push({date: iso(year,m,lastWeekdayOfMonth(year,m,2)), name:"Consumer Confidence Index (Conference Board)", ruleNote:"Computed: last Tuesday of month"});
+    events.push({date: iso(year,m,lastWeekdayOfMonth(year,m,2)), name:"Case-Shiller Home Price Index", ruleNote:"Computed: last Tuesday of month"});
+
+    const hs = HARD_DATES_2026["Housing Starts & Building Permits"][m];
+    events.push({date: iso(year,m,hs-1), name:"NAHB Home Builder Confidence Index", ruleNote:"Computed: day before Housing Starts"});
+  }
+
+  return events.filter(e => e.date && findEventByName(e.name)).sort((a,b)=> a.date.localeCompare(b.date));
+}
+
+const CALENDAR_EVENTS = buildCalendarEvents(2026);
+
+// ---- LIVE FEED (optional) ----
+// Paste your deployed worker URL here to auto-refresh dates + pull in
+// Fed speeches. Leave as-is to keep using the static 2026 schedule only.
+const LIVE_WORKER_URL = ""; // e.g. "https://tremor-live.yourname.workers.dev"
+
+let liveSpeeches = [];
+let liveMonetaryNews = [];
+
+async function loadLiveOverlay(){
+  if(!LIVE_WORKER_URL) return;
+  try{
+    const [relResp, spResp, mnResp] = await Promise.all([
+      fetch(`${LIVE_WORKER_URL}/?type=releases`),
+      fetch(`${LIVE_WORKER_URL}/?type=speeches`),
+      fetch(`${LIVE_WORKER_URL}/?type=monetary-news`),
+    ]);
+    if(relResp.ok){
+      const liveDates = await relResp.json();
+      Object.entries(liveDates).forEach(([name, date])=>{
+        if(!date) return;
+        // remove any static/computed entries for this indicator from today forward, replace with the live-confirmed one
+        const todayISO = new Date().toISOString().slice(0,10);
+        for(let i=CALENDAR_EVENTS.length-1; i>=0; i--){
+          if(CALENDAR_EVENTS[i].name === name && CALENDAR_EVENTS[i].date >= todayISO) CALENDAR_EVENTS.splice(i,1);
+        }
+        CALENDAR_EVENTS.push({date, name, ruleNote:"Live from FRED"});
+      });
+      CALENDAR_EVENTS.sort((a,b)=>a.date.localeCompare(b.date));
+    }
+    if(spResp.ok){
+      liveSpeeches = await spResp.json(); // now includes testimony too (combined feed)
+    }
+    if(mnResp.ok){
+      liveMonetaryNews = await mnResp.json(); // Beige Book / FOMC statements / Minutes, as published
+    }
+  }catch(e){
+    console.error("Live feed unavailable, using static schedule:", e);
+  }
+  // if the calendar tab is currently open, re-render with the fresh data
+  if(document.getElementById('calendarView').style.display !== 'none') renderCalendar();
+}
+loadLiveOverlay();
+
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function daysFromToday(dateStr){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(dateStr + 'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+
+function mondayOf(dateStr){
+  const d = new Date(dateStr + 'T00:00:00');
+  const dow = d.getDay(); // 0=Sun..6=Sat
+  const diff = dow === 0 ? -6 : 1 - dow; // shift to Monday
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+function fmtShort(d){ return d.toLocaleDateString('en-US',{month:'short', day:'numeric'}); }
+
+function renderCalendar(){
+  const calMonths = document.getElementById('calMonths');
+  const calNav = document.getElementById('calNav');
+  calMonths.innerHTML = '';
+  calNav.innerHTML = '';
+
+  if(liveSpeeches.length){
+    const sp = document.createElement('div');
+    sp.className = 'cal-pinned';
+    sp.style.flexDirection = 'column';
+    sp.style.alignItems = 'flex-start';
+    sp.innerHTML = `<div>🎙 <b>Recently announced Fed speeches & testimony</b> (live from federalreserve.gov)</div>` +
+      liveSpeeches.slice(0,5).map(s => `<div style="margin-top:6px; font-size:12px;"><a href="${s.link}" target="_blank" rel="noopener" style="color:var(--text-mid);">${s.title}</a> <span style="color:var(--text-lo)">— ${s.date}</span></div>`).join('');
+    calMonths.appendChild(sp);
+  }
+
+  if(liveMonetaryNews.length){
+    const mn = document.createElement('div');
+    mn.className = 'cal-pinned';
+    mn.style.flexDirection = 'column';
+    mn.style.alignItems = 'flex-start';
+    mn.innerHTML = `<div>🏛 <b>Recent monetary policy releases</b> (Beige Book, FOMC statements, Minutes — live from federalreserve.gov)</div>` +
+      liveMonetaryNews.slice(0,5).map(s => `<div style="margin-top:6px; font-size:12px;"><a href="${s.link}" target="_blank" rel="noopener" style="color:var(--text-mid);">${s.title}</a> <span style="color:var(--text-lo)">— ${s.date}</span></div>`).join('');
+    calMonths.appendChild(mn);
+  }
+
+  const todayISO = new Date().toISOString().slice(0,10);
+  const currentMonthKey = todayISO.slice(0,7); // YYYY-MM
+
+  const byMonth = {};
+  CALENDAR_EVENTS.forEach(ev=>{
+    const key = ev.date.slice(0,7);
+    if(!byMonth[key]) byMonth[key] = [];
+    byMonth[key].push(ev);
+  });
+
+  let currentMonthEl = null;
+
+  for(let m=0; m<12; m++){
+    const key = `2026-${pad2(m+1)}`;
+    const events = byMonth[key] || [];
+    const slug = 'calmo-' + key;
+
+    const navLink = document.createElement('a');
+    navLink.href = '#'+slug;
+    navLink.textContent = MONTH_NAMES[m];
+    if(key === currentMonthKey) navLink.classList.add('active');
+    navLink.addEventListener('click', e=>{ e.preventDefault(); document.getElementById(slug).scrollIntoView({behavior:'smooth', block:'start'}); });
+    calNav.appendChild(navLink);
+
+    const block = document.createElement('div');
+    block.className = 'cal-month';
+    block.id = slug;
+    block.innerHTML = `<div class="cal-month-head">${MONTH_NAMES[m]} 2026</div>`;
+    if(key === currentMonthKey) currentMonthEl = block;
+
+    if(events.length === 0){
+      const empty = document.createElement('div');
+      empty.style.cssText = 'color:var(--text-lo); font-family:JetBrains Mono,monospace; font-size:12.5px; padding:10px 0;';
+      empty.textContent = 'No tracked releases found for this month — schedule may need extending.';
+      block.appendChild(empty);
+      calMonths.appendChild(block);
+      continue;
+    }
+
+    // sub-group this month's events by week
+    const byWeek = {};
+    events.forEach(ev=>{
+      const weekStart = mondayOf(ev.date);
+      const wkey = weekStart.toISOString().slice(0,10);
+      if(!byWeek[wkey]) byWeek[wkey] = { start: weekStart, events: [] };
+      byWeek[wkey].events.push(ev);
+    });
+    const thisWeekMonday = mondayOf(todayISO).toISOString().slice(0,10);
+
+    Object.keys(byWeek).sort().forEach(wkey=>{
+      const { start, events: wkEvents } = byWeek[wkey];
+      const end = new Date(start); end.setDate(end.getDate()+6);
+      const isCurrentWeek = wkey === thisWeekMonday;
+      const weekLabel = isCurrentWeek ? 'This week' : `Week of ${fmtShort(start)}`;
+
+      const weekHead = document.createElement('div');
+      weekHead.style.cssText = 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-lo); margin:16px 0 6px; padding-left:2px;';
+      weekHead.textContent = `${weekLabel} — ${fmtShort(start)}–${fmtShort(end)}`;
+      block.appendChild(weekHead);
+
+      wkEvents.sort((a,b)=>a.date.localeCompare(b.date)).forEach(ev=>{
+        const it = findEventByName(ev.name);
+        if(!it) return;
+        const d = new Date(ev.date + 'T12:00:00');
+        const dow = d.toLocaleDateString('en-US',{weekday:'short'});
+        const dnum = d.getDate();
+        const diff = daysFromToday(ev.date);
+        const row = document.createElement('div');
+        row.className = 'cal-row' + (diff===0?' today':'') + (diff>0 && diff<=6 ? ' soon':'');
+        row.innerHTML = `
+          <div class="cal-date">${dow}<b>${dnum}</b></div>
+          <div>
+            <div class="cal-name">${ev.name}</div>
+            <div class="cal-period">${ev.period || it.sub || ''}${diff===0?' · Today':diff>0?` · in ${diff}d`:diff<0?' · Past':''}</div>
+            ${ev.ruleNote ? `<div class="cal-rulenote">${ev.ruleNote}</div>` : ''}
+          </div>
+          <div class="badge ${IMPACT_CLASS[it.impact]}">${it.impact}</div>
+        `;
+        row.addEventListener('click', ()=> openModal(it));
+        block.appendChild(row);
+      });
+    });
+
+    calMonths.appendChild(block);
+  }
+
+  // auto-jump straight to the current month — no manual scrolling needed
+  if(currentMonthEl){
+    requestAnimationFrame(()=> currentMonthEl.scrollIntoView({behavior:'auto', block:'start'}));
+  }
+}
+
+/* view toggle */
+document.getElementById('viewToggle').addEventListener('click', e=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  document.querySelectorAll('.view-toggle button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const isCalendar = btn.dataset.view === 'calendar';
+  document.getElementById('referenceView').style.display = isCalendar ? 'none' : 'block';
+  document.getElementById('calendarView').style.display = isCalendar ? 'block' : 'none';
+  if(isCalendar) renderCalendar();
+});
 
 render();
 
