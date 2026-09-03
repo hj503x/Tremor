@@ -1436,7 +1436,11 @@ function renderCalendar(){
 function activeMonthReferenceLine(){
   const raw = getComputedStyle(document.documentElement).getPropertyValue('--sticky-clear');
   const px = parseFloat(raw);
-  return (isFinite(px) ? px : 170) - 8; // small buffer so a section counts as "current" right as its header clears the sticky bars
+  // scrollIntoView lands a section's top exactly at the --sticky-clear value (that's what
+  // scroll-margin-top does), so the line must sit slightly BELOW that landing point —
+  // otherwise the section you just tapped to narrowly fails its own "am I current" check
+  // and the previous section keeps the active state by default. (This was backwards before.)
+  return (isFinite(px) ? px : 170) + 14;
 }
 
 function setActiveMonthChip(slug){
