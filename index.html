@@ -28,12 +28,15 @@
   html,body{background:var(--ink); color:var(--text-hi); font-family:'Inter',sans-serif;}
   ::selection{background:var(--hot); color:var(--ink);}
 
-  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.94); backdrop-filter:blur(10px);}
+  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.94); backdrop-filter:blur(10px); transition:padding .2s ease;}
+  header.compact{padding:14px 24px;}
   .header-inner{max-width:1100px; margin:0 auto;}
   .brand{display:flex; align-items:baseline; gap:12px;}
-  .brand h1{font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:34px; letter-spacing:-0.01em;}
-  .brand .dot{width:9px; height:9px; border-radius:50%; background:var(--hot); box-shadow:0 0 0 4px var(--hot-dim);}
-  .brand-sub{color:var(--text-lo); font-size:13px; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px;}
+  .brand h1{font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:34px; letter-spacing:-0.01em; transition:font-size .2s ease;}
+  header.compact .brand h1{font-size:20px;}
+  .brand .dot{width:9px; height:9px; border-radius:50%; background:var(--hot); box-shadow:0 0 0 4px var(--hot-dim); flex-shrink:0;}
+  .brand-sub{color:var(--text-lo); font-size:13px; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px; max-height:40px; overflow:hidden; transition:max-height .2s ease, opacity .2s ease, margin .2s ease; opacity:1;}
+  header.compact .brand-sub{max-height:0; opacity:0; margin-top:0;}
 
   main{max-width:1100px; margin:0 auto; padding:32px 24px 80px;}
   .lede{max-width:640px; margin-bottom:26px;}
@@ -65,7 +68,22 @@
 
   .cal-layout{display:block;}
   .cal-nav{display:none;}
+
+  .cal-month-picker{
+    display:flex; gap:6px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    position:sticky; z-index:30; background:var(--ink);
+    padding:10px 0 14px; margin-bottom:6px; border-bottom:1px solid var(--hairline);
+  }
+  .cal-month-picker::-webkit-scrollbar{display:none;}
+  .cal-month-picker button{
+    flex-shrink:0; font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:0.03em;
+    padding:7px 13px; border-radius:100px; border:1px solid var(--hairline); background:var(--panel);
+    color:var(--text-mid); cursor:pointer; transition:all .15s ease;
+  }
+  .cal-month-picker button.active{background:var(--text-hi); color:var(--ink); border-color:var(--text-hi);}
+
   @media (min-width:900px){
+    .cal-month-picker{display:none;}
     .cal-layout{display:grid; grid-template-columns:150px 1fr; gap:36px; align-items:start;}
     .cal-nav{display:block; position:sticky; top:150px;}
     .cal-nav a{display:block; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); padding:7px 0; text-decoration:none; border-left:2px solid transparent; padding-left:12px; transition:color .15s ease, border-color .15s ease;}
@@ -73,7 +91,7 @@
     .cal-nav a.active{color:var(--hot); border-left-color:var(--hot);}
   }
 
-  .cal-month{margin-bottom:36px; scroll-margin-top:180px;}
+  .cal-month{margin-bottom:36px; scroll-margin-top:var(--sticky-clear, 170px);}
   .cal-month-head{font-family:'Fraunces',serif; font-style:italic; font-weight:600; font-size:19px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--hairline);}
 
   .cal-row{
@@ -83,6 +101,12 @@
   .cal-row:hover{background:var(--panel);}
   .cal-row.today{background:var(--hot-dim);}
   .cal-row.soon .cal-date b{color:var(--amber);}
+  .cal-row.past{opacity:0.4;}
+  .cal-row.past:hover{opacity:0.7;}
+  .cal-row.recurring{padding:8px 10px; opacity:0.75;}
+  .cal-row.recurring .cal-name{font-size:12.5px; font-weight:500;}
+  .cal-row.recurring .cal-date b{font-size:13px;}
+  .cal-row.recurring.past{opacity:0.35;}
   .cal-date{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); line-height:1.4;}
   .cal-date b{display:block; font-size:15px; color:var(--text-hi); font-weight:700;}
   .cal-name{font-size:14px; font-weight:600; color:var(--text-hi);}
@@ -381,8 +405,8 @@
   </div>
 
   <div id="calendarView" style="display:none;">
-    <div class="cal-pinned">🔁 <span><b>Weekly Initial Jobless Claims</b> — every Thursday, 8:30am ET (not listed individually below)</span></div>
     <div class="cal-tba"><b>Not on a fixed public schedule:</b> Fed speeches and testimony are announced only 1–2 weeks ahead by the Fed itself — shown live above once the FRED/RSS worker is connected, otherwise not listed below. Existing Home Sales, Pending Home Sales, and NAHB don't publish a fixed weekday rule either — all of these stay in the Reference tab, just without a calendar date.</div>
+    <div class="cal-month-picker" id="calMonthPicker"></div>
     <div class="cal-layout">
       <nav class="cal-nav" id="calNav"></nav>
       <div id="calMonths"></div>
@@ -1052,6 +1076,43 @@ const BEIGE_DATES_2026 = ["2026-01-14","2026-03-04","2026-04-15","2026-06-03","2
 function pad2(n){ return String(n).padStart(2,'0'); }
 function iso(y,m,d){ return `${y}-${pad2(m+1)}-${pad2(d)}`; } // m is 0-indexed
 
+// Official release time of day, Eastern Time, for every indicator that appears in the calendar.
+const TIME_ET = {
+  "CPI & Core CPI": [8,30], "PPI & Core PPI": [8,30], "Non-Farm Payrolls (NFP)": [8,30],
+  "Unemployment Rate": [8,30], "Average Hourly Earnings": [8,30],
+  "PCE Price Index & Core PCE": [8,30], "Personal Income & Personal Spending": [8,30],
+  "Retail Sales & Core Retail Sales": [8,30], "Housing Starts & Building Permits": [8,30],
+  "Durable Goods Orders": [8,30], "Trade Balance": [8,30], "Import / Export Price Index": [8,30],
+  "Weekly Initial Jobless Claims": [8,30], "GDP (Advance / Preliminary / Final)": [8,30],
+  "Industrial Production & Capacity Utilization": [9,15],
+  "Case-Shiller Home Price Index": [9,0],
+  "JOLTS Job Openings": [10,0], "ISM Manufacturing PMI": [10,0], "ISM Services PMI": [10,0],
+  "U. Michigan Consumer Sentiment": [10,0], "Consumer Confidence Index (Conference Board)": [10,0],
+  "New Home Sales": [10,0], "NAHB Home Builder Confidence Index": [10,0],
+  "FOMC Rate Decision": [14,0], "FOMC Minutes": [14,0], "Fed Beige Book": [14,0],
+};
+
+// 2026 US DST window (2nd Sunday March – 1st Sunday November) → ET offset for a given date.
+function etOffsetForDate(dateStr){
+  return (dateStr >= '2026-03-08' && dateStr < '2026-11-01') ? '-04:00' : '-05:00';
+}
+function releaseDateTime(dateStr, name){
+  const [h,m] = TIME_ET[name] || [8,30];
+  return new Date(`${dateStr}T${pad2(h)}:${pad2(m)}:00${etOffsetForDate(dateStr)}`);
+}
+function fmtTimeET(dt){
+  return dt.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', timeZone:'America/New_York'}) + ' ET';
+}
+function fmtTimeLocal(dt){
+  const time = dt.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+  const tzName = dt.toLocaleTimeString('en-US', {timeZoneName:'short'}).split(' ').slice(2).join(' ');
+  return `${time}${tzName ? ' '+tzName : ''}`;
+}
+function isUserInET(){
+  try{ return Intl.DateTimeFormat().resolvedOptions().timeZone === 'America/New_York'; }catch(e){ return false; }
+}
+const userInET = isUserInET();
+
 function nthWeekdayOfMonth(year, month, weekday, n){ // month 0-indexed, weekday 0=Sun..6=Sat
   let count = 0;
   const daysInMonth = new Date(year, month+1, 0).getDate();
@@ -1111,6 +1172,17 @@ function buildCalendarEvents(year){
 
     const hs = HARD_DATES_2026["Housing Starts & Building Permits"][m];
     events.push({date: iso(year,m,hs-1), name:"NAHB Home Builder Confidence Index", ruleNote:"Computed: day before Housing Starts"});
+  }
+
+  // Weekly Initial Jobless Claims — every Thursday of the year, 8:30am ET
+  {
+    let cursor = new Date(year, 0, 1);
+    while(cursor.getFullYear() === year){
+      if(cursor.getDay() === 4){ // Thursday
+        events.push({date: iso(cursor.getFullYear(), cursor.getMonth(), cursor.getDate()), name:"Weekly Initial Jobless Claims", ruleNote:"Every Thursday, 8:30am ET"});
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
   }
 
   return events.filter(e => e.date && findEventByName(e.name)).sort((a,b)=> a.date.localeCompare(b.date));
@@ -1178,11 +1250,43 @@ function mondayOf(dateStr){
 }
 function fmtShort(d){ return d.toLocaleDateString('en-US',{month:'short', day:'numeric'}); }
 
+const headerEl = document.querySelector('header');
+let headerTicking = false;
+window.addEventListener('scroll', ()=>{
+  if(headerTicking) return;
+  headerTicking = true;
+  requestAnimationFrame(()=>{
+    const y = Math.max(0, window.scrollY); // ignore iOS rubber-band negative overscroll
+    const isCompact = headerEl.classList.contains('compact');
+    // hysteresis: different thresholds to collapse vs expand, so hovering near one value can't flicker
+    const shouldCollapse = isCompact ? y > 30 : y > 70;
+    if(isCompact !== shouldCollapse) headerEl.classList.toggle('compact', shouldCollapse);
+    headerTicking = false;
+  });
+});
+// re-measure only once the collapse/expand transition has actually finished, not mid-animation —
+// reading offsetHeight during the transition returns an intermediate value, which is what caused
+// the month picker to visibly lag/jump behind the header's real settled height.
+headerEl.addEventListener('transitionend', (e)=>{ if(e.propertyName === 'padding') syncPickerOffset(); });
+
+function syncPickerOffset(){
+  const header = document.querySelector('header');
+  const picker = document.getElementById('calMonthPicker');
+  if(!header || !picker) return;
+  const headerH = header.offsetHeight;
+  picker.style.top = headerH + 'px';
+  document.documentElement.style.setProperty('--sticky-clear', (headerH + picker.offsetHeight + 20) + 'px');
+}
+window.addEventListener('resize', syncPickerOffset);
+
 function renderCalendar(){
+  syncPickerOffset();
   const calMonths = document.getElementById('calMonths');
   const calNav = document.getElementById('calNav');
+  const calMonthPicker = document.getElementById('calMonthPicker');
   calMonths.innerHTML = '';
   calNav.innerHTML = '';
+  calMonthPicker.innerHTML = '';
 
   if(liveSpeeches.length){
     const sp = document.createElement('div');
@@ -1221,12 +1325,22 @@ function renderCalendar(){
     const events = byMonth[key] || [];
     const slug = 'calmo-' + key;
 
+    const hasLive = events.some(ev => ev.ruleNote === "Live from FRED");
+    const liveDot = hasLive ? `<span style="color:var(--amber);">●</span>` : '';
+
     const navLink = document.createElement('a');
     navLink.href = '#'+slug;
-    navLink.textContent = MONTH_NAMES[m];
+    navLink.innerHTML = MONTH_NAMES[m] + (hasLive ? ` ${liveDot}` : '');
     if(key === currentMonthKey) navLink.classList.add('active');
-    navLink.addEventListener('click', e=>{ e.preventDefault(); document.getElementById(slug).scrollIntoView({behavior:'smooth', block:'start'}); });
+    navLink.addEventListener('click', e=>{ e.preventDefault(); jumpToMonth(slug); });
     calNav.appendChild(navLink);
+
+    const pickerBtn = document.createElement('button');
+    pickerBtn.innerHTML = MONTH_NAMES[m].slice(0,3) + (hasLive ? ` ${liveDot}` : '');
+    pickerBtn.dataset.slug = slug;
+    if(key === currentMonthKey) pickerBtn.classList.add('active');
+    pickerBtn.addEventListener('click', ()=> jumpToMonth(slug));
+    calMonthPicker.appendChild(pickerBtn);
 
     const block = document.createElement('div');
     block.className = 'cal-month';
@@ -1260,7 +1374,9 @@ function renderCalendar(){
       const weekLabel = isCurrentWeek ? 'This week' : `Week of ${fmtShort(start)}`;
 
       const weekHead = document.createElement('div');
-      weekHead.style.cssText = 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-lo); margin:16px 0 6px; padding-left:2px;';
+      weekHead.style.cssText = isCurrentWeek
+        ? 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--hot); margin:16px 0 6px; padding:6px 10px; background:var(--hot-dim); border-radius:6px; display:inline-block;'
+        : 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-lo); margin:16px 0 6px; padding-left:2px;';
       weekHead.textContent = `${weekLabel} — ${fmtShort(start)}–${fmtShort(end)}`;
       block.appendChild(weekHead);
 
@@ -1271,13 +1387,17 @@ function renderCalendar(){
         const dow = d.toLocaleDateString('en-US',{weekday:'short'});
         const dnum = d.getDate();
         const diff = daysFromToday(ev.date);
+        const releaseDt = releaseDateTime(ev.date, ev.name);
+        const timePart = userInET ? fmtTimeET(releaseDt) : `${fmtTimeET(releaseDt)} · ${fmtTimeLocal(releaseDt)}`;
+        const countdownPart = diff===0?'Today':diff>0?`In ${diff}d`:'Past';
         const row = document.createElement('div');
-        row.className = 'cal-row' + (diff===0?' today':'') + (diff>0 && diff<=6 ? ' soon':'');
+        row.className = 'cal-row' + (diff===0?' today':'') + (diff>0 && diff<=6 ? ' soon':'') + (diff<0 ? ' past':'') + (ev.name==="Weekly Initial Jobless Claims" ? ' recurring':'');
         row.innerHTML = `
           <div class="cal-date">${dow}<b>${dnum}</b></div>
           <div>
             <div class="cal-name">${ev.name}</div>
-            <div class="cal-period">${ev.period || it.sub || ''}${diff===0?' · Today':diff>0?` · in ${diff}d`:diff<0?' · Past':''}</div>
+            ${(ev.period || it.sub) ? `<div class="cal-period">${ev.period || it.sub}</div>` : ''}
+            <div class="cal-rulenote" style="font-style:normal; color:var(--text-mid);">${countdownPart} · ${timePart}</div>
             ${ev.ruleNote ? `<div class="cal-rulenote">${ev.ruleNote}</div>` : ''}
           </div>
           <div class="badge ${IMPACT_CLASS[it.impact]}">${it.impact}</div>
@@ -1294,6 +1414,66 @@ function renderCalendar(){
   if(currentMonthEl){
     requestAnimationFrame(()=> currentMonthEl.scrollIntoView({behavior:'auto', block:'start'}));
   }
+  // keep the mobile picker's active chip scrolled into view horizontally
+  const activePickerBtn = calMonthPicker.querySelector('button.active');
+  if(activePickerBtn){
+    requestAnimationFrame(()=> activePickerBtn.scrollIntoView({behavior:'auto', block:'nearest', inline:'center'}));
+  }
+
+  setupCalendarScrollSpy();
+  requestAnimationFrame(syncPickerOffset); // re-measure now that chips are actually populated
+}
+
+// Highlights whichever month is currently in view, in both the desktop sidebar and mobile picker —
+// so there's always a visible "you are here" marker, not just on initial load.
+//
+// This measures layout directly on every scroll tick rather than reacting to
+// IntersectionObserver enter/exit events. The observer approach broke in both
+// directions: forward jumps could catch a stale mid-scroll reading, and backward
+// jumps (e.g. December -> January) simply take longer to animate than any fixed
+// "suppress the observer for N ms" timeout could safely cover. Measuring fresh
+// on every tick has no such timing assumption to get wrong.
+function activeMonthReferenceLine(){
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--sticky-clear');
+  const px = parseFloat(raw);
+  return (isFinite(px) ? px : 170) - 8; // small buffer so a section counts as "current" right as its header clears the sticky bars
+}
+
+function setActiveMonthChip(slug){
+  document.querySelectorAll('.cal-nav a, .cal-month-picker button').forEach(el=>{
+    const match = el.tagName==='A' ? el.getAttribute('href')==='#'+slug : el.dataset.slug===slug;
+    el.classList.toggle('active', match);
+  });
+}
+
+function updateActiveMonthFromScroll(){
+  const sections = document.querySelectorAll('.cal-month');
+  if(!sections.length) return;
+  const line = activeMonthReferenceLine();
+  let current = sections[0];
+  sections.forEach(s => { if(s.getBoundingClientRect().top <= line) current = s; });
+  setActiveMonthChip(current.id);
+}
+
+let calScrollTicking = false;
+function setupCalendarScrollSpy(){
+  updateActiveMonthFromScroll();
+  if(setupCalendarScrollSpy._bound) return; // listener only needs registering once
+  setupCalendarScrollSpy._bound = true;
+  window.addEventListener('scroll', ()=>{
+    if(calScrollTicking) return;
+    calScrollTicking = true;
+    requestAnimationFrame(()=>{ updateActiveMonthFromScroll(); calScrollTicking = false; });
+  });
+}
+
+// Shared handler for month-nav clicks: sets the active state immediately for instant
+// feedback, then lets the same scroll-driven measurement above naturally confirm (or
+// correct) it once the smooth scroll actually settles — no timers, no direction bias.
+function jumpToMonth(slug){
+  setActiveMonthChip(slug);
+  const target = document.getElementById(slug);
+  if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 /* view toggle */
