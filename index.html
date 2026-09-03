@@ -28,7 +28,8 @@
   html,body{background:var(--ink); color:var(--text-hi); font-family:'Inter',sans-serif;}
   ::selection{background:var(--hot); color:var(--ink);}
 
-  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.94); backdrop-filter:blur(10px); transition:padding .2s ease;}
+  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.94); backdrop-filter:blur(10px); transition:padding .2s ease; overflow-anchor:none;}
+  html{overflow-anchor:none;}
   header.compact{padding:14px 24px;}
   .header-inner{max-width:1100px; margin:0 auto;}
   .brand{display:flex; align-items:baseline; gap:12px;}
