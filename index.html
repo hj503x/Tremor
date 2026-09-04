@@ -11,27 +11,51 @@
     --ink:#0A0C10;
     --panel:#12151B;
     --panel-2:#171B22;
-    --hairline:#242932;
-    --text-hi:#F3F1E9;
-    --text-lo:#868C9A;
-    --text-mid:#B7BBC4;
-    --hot:#E8552B;
-    --hot-dim:#3A241C;
-    --cold:#2F7DE8;
-    --cold-dim:#1B2638;
-    --amber:#E8B32E;
-    --amber-dim:#3A311B;
-    --info:#8B7FE8;
-    --info-dim:#251F3A;
+    --hairline:#2A303B;
+    --text-hi:#FFFFFF;
+    --text-lo:#AEB4C0;
+    --text-mid:#D9DCE3;
+    --hot:#FF5C33;
+    --hot-dim:#40241A;
+    --cold:#3D8BFF;
+    --cold-dim:#1B2A42;
+    --amber:#FFC939;
+    --amber-dim:#3D3316;
+    --info:#A78BFA;
+    --info-dim:#2A2145;
+    --header-bg:rgba(10,12,16,0.94);
+    --scrim:rgba(6,7,9,0.6);
+    color-scheme: dark;
+  }
+  html[data-theme="light"]{
+    --ink:#F6F3EC;
+    --panel:#FFFFFF;
+    --panel-2:#F0EBE0;
+    --hairline:#E2DCCB;
+    --text-hi:#16181D;
+    --text-lo:#54586A;
+    --text-mid:#282B33;
+    --hot:#D6431F;
+    --hot-dim:#FBE3D8;
+    --cold:#1D5FCB;
+    --cold-dim:#DCE7FB;
+    --amber:#9C6F0A;
+    --amber-dim:#FBEFD2;
+    --info:#6D4FD1;
+    --info-dim:#ECE6FB;
+    --header-bg:rgba(246,243,236,0.92);
+    --scrim:rgba(30,26,20,0.35);
+    color-scheme: light;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{background:var(--ink); color:var(--text-hi); font-family:'Inter',sans-serif;}
+  html,body{background:var(--ink); color:var(--text-hi); font-family:'Inter',sans-serif; transition:background-color .25s ease, color .25s ease;}
   ::selection{background:var(--hot); color:var(--ink);}
 
-  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:rgba(10,12,16,0.94); backdrop-filter:blur(10px); transition:padding .2s ease; overflow-anchor:none;}
+  header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:var(--header-bg); backdrop-filter:blur(10px); transition:padding .2s ease, background-color .25s ease, border-color .25s ease; overflow-anchor:none;}
   html{overflow-anchor:none;}
   header.compact{padding:14px 24px;}
   .header-inner{max-width:1100px; margin:0 auto;}
+  .header-row{display:flex; align-items:center; justify-content:space-between; gap:12px;}
   .brand{display:flex; align-items:baseline; gap:12px;}
   .brand h1{font-family:'Fraunces',serif; font-weight:700; font-style:italic; font-size:34px; letter-spacing:-0.01em; transition:font-size .2s ease;}
   header.compact .brand h1{font-size:20px;}
@@ -39,12 +63,22 @@
   .brand-sub{color:var(--text-lo); font-size:13px; letter-spacing:0.04em; text-transform:uppercase; margin-top:4px; max-height:40px; overflow:hidden; transition:max-height .2s ease, opacity .2s ease, margin .2s ease; opacity:1;}
   header.compact .brand-sub{max-height:0; opacity:0; margin-top:0;}
 
+  .theme-toggle{
+    flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--hairline);
+    background:var(--panel); color:var(--text-mid); cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:border-color .15s ease, background .15s ease, color .15s ease, transform .3s ease, width .2s ease, height .2s ease;
+  }
+  .theme-toggle:hover{border-color:var(--text-lo); color:var(--text-hi);}
+  .theme-toggle:active{transform:scale(0.9) rotate(-15deg);}
+  .theme-toggle svg{transition:opacity .2s ease, transform .3s ease;}
+  header.compact .theme-toggle{width:32px; height:32px;}
+
   main{max-width:1100px; margin:0 auto; padding:32px 24px 80px;}
   .lede{max-width:640px; margin-bottom:26px;}
   .lede p{color:var(--text-lo); font-size:14.5px; line-height:1.6;}
   .surprise-note{
     max-width:640px; margin-bottom:26px; padding:14px 16px; border-radius:9px;
-    background:var(--amber-dim); border:1px solid #4A3F1E; font-size:13px; color:var(--text-mid); line-height:1.6;
+    background:var(--amber-dim); border:1px solid color-mix(in srgb, var(--amber) 45%, var(--hairline)); font-size:13px; color:var(--text-hi); line-height:1.6;
   }
   .surprise-note b{color:var(--amber);}
 
@@ -62,7 +96,7 @@
   }
   .cal-pinned b{color:var(--text-hi);}
   .cal-tba{
-    padding:14px 16px; margin-bottom:30px; background:var(--info-dim); border:1px solid #372E56; border-radius:10px;
+    padding:14px 16px; margin-bottom:30px; background:var(--info-dim); border:1px solid color-mix(in srgb, var(--info) 45%, var(--hairline)); border-radius:10px;
     font-size:13px; color:var(--text-mid); line-height:1.6;
   }
   .cal-tba b{color:var(--info);}
@@ -97,17 +131,19 @@
 
   .cal-row{
     display:grid; grid-template-columns:80px 1fr auto; align-items:center; gap:14px;
-    padding:12px 10px; border-bottom:1px solid var(--hairline); cursor:pointer; transition:background .15s ease;
+    padding:12px 10px; border-bottom:1px solid var(--hairline); border-left:3px solid transparent; cursor:pointer;
+    transition:background .15s ease, border-left-color .15s ease;
   }
-  .cal-row:hover{background:var(--panel);}
+  .cal-row:hover{background:color-mix(in srgb, var(--hot) 14%, var(--panel)); border-left-color:var(--hot);}
   .cal-row.today{background:var(--hot-dim);}
+  .cal-row.today:hover{background:color-mix(in srgb, var(--hot) 22%, var(--hot-dim));}
   .cal-row.soon .cal-date b{color:var(--amber);}
-  .cal-row.past{opacity:0.4;}
-  .cal-row.past:hover{opacity:0.7;}
-  .cal-row.recurring{padding:8px 10px; opacity:0.75;}
+  .cal-row.past{opacity:0.65;}
+  .cal-row.past:hover{opacity:0.9;}
+  .cal-row.recurring{padding:8px 10px; opacity:0.85;}
   .cal-row.recurring .cal-name{font-size:12.5px; font-weight:500;}
   .cal-row.recurring .cal-date b{font-size:13px;}
-  .cal-row.recurring.past{opacity:0.35;}
+  .cal-row.recurring.past{opacity:0.6;}
   .cal-date{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); line-height:1.4;}
   .cal-date b{display:block; font-size:15px; color:var(--text-hi); font-weight:700;}
   .cal-name{font-size:14px; font-weight:600; color:var(--text-hi);}
@@ -153,7 +189,7 @@
     position:relative; background:var(--panel); border:1px solid var(--hairline); border-left:3px solid var(--hairline); border-radius:10px;
     padding:20px 20px 20px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
   }
-  .card:hover{border-color:var(--text-lo); background:var(--panel-2); box-shadow:0 6px 18px rgba(0,0,0,0.35); transform:translateY(-1px);}
+  .card:hover{border-color:var(--text-lo); background:color-mix(in srgb, var(--hot) 8%, var(--panel-2)); box-shadow:0 6px 18px rgba(0,0,0,0.35); transform:translateY(-1px);}
   .card:hover{border-left-width:3px;} /* keep accent width stable on hover */
   .card:focus-visible{outline:2px solid var(--hot); outline-offset:2px;}
   .card.info-type{border-style:dashed; border-left-style:solid;}
@@ -271,7 +307,7 @@
 
   /* ---------- PANEL (bottom sheet on mobile, right drawer on desktop) ---------- */
   .overlay{
-    position:fixed; inset:0; background:rgba(6,7,9,0.6); backdrop-filter:blur(3px);
+    position:fixed; inset:0; background:var(--scrim); backdrop-filter:blur(3px);
     z-index:100; opacity:0; pointer-events:none; transition:opacity .25s ease;
   }
   .overlay.show{opacity:1; pointer-events:all;}
@@ -301,8 +337,8 @@
 
   .matrix{display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:18px;}
   .mcol{border-radius:10px; padding:18px; border:1px solid var(--hairline);}
-  .mcol.hotc{background:linear-gradient(180deg, var(--hot-dim), transparent); border-color:#4A2E20;}
-  .mcol.coldc{background:linear-gradient(180deg, var(--cold-dim), transparent); border-color:#233450;}
+  .mcol.hotc{background:linear-gradient(180deg, var(--hot-dim), transparent); border-color:color-mix(in srgb, var(--hot) 40%, var(--hairline));}
+  .mcol.coldc{background:linear-gradient(180deg, var(--cold-dim), transparent); border-color:color-mix(in srgb, var(--cold) 40%, var(--hairline));}
   .mcol h4{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.06em; margin-bottom:14px;}
   .mcol.hotc h4{color:var(--hot);}
   .mcol.coldc h4{color:var(--cold);}
@@ -318,7 +354,7 @@
   .corr-label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em; color:var(--text-lo); text-transform:uppercase; margin-bottom:9px;}
   .corr-chips{display:flex; flex-wrap:wrap; gap:7px;}
   .corr-chip{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; padding:5px 11px; border-radius:6px; background:var(--panel); border:1px solid var(--hairline); color:var(--text-hi);}
-  .info-box{padding:18px; background:var(--info-dim); border:1px solid #372E56; border-radius:10px; font-size:13.5px; color:var(--text-mid); line-height:1.7;}
+  .info-box{padding:18px; background:var(--info-dim); border:1px solid color-mix(in srgb, var(--info) 45%, var(--hairline)); border-radius:10px; font-size:13.5px; color:var(--text-mid); line-height:1.7;}
   .info-box b{color:var(--info);}
 
   .related-chip{
@@ -338,14 +374,36 @@
   .magnitude-line b{color:var(--text-mid); font-style:normal;}
 
   footer{text-align:center; padding:20px 24px 50px; color:var(--text-lo); font-size:12px; font-family:'JetBrains Mono',monospace;}
+
+  /* dark shadows tuned for a black background look too harsh on white — soften them in light mode */
+  html[data-theme="light"] .card:hover{box-shadow:0 4px 14px rgba(20,18,12,0.10);}
+  html[data-theme="light"] .back-top{box-shadow:0 4px 14px rgba(20,18,12,0.14);}
+  html[data-theme="light"] .compare-bar{box-shadow:0 8px 24px rgba(20,18,12,0.16);}
+  html[data-theme="light"] .modal{box-shadow:0 8px 30px rgba(20,18,12,0.14);}
   footer .updated{display:block; margin-top:6px; opacity:0.7;}
 </style>
+<script>
+// Runs synchronously before paint so there's no flash of the wrong theme on load.
+(function(){
+  try{
+    var saved = localStorage.getItem('tremor-theme');
+    var wantsLight = saved ? saved === 'light' : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches);
+    if(wantsLight) document.documentElement.setAttribute('data-theme', 'light');
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
 <header>
   <div class="header-inner">
-    <div class="brand"><h1>TREMOR</h1><span class="dot"></span></div>
+    <div class="header-row">
+      <div class="brand"><h1>TREMOR</h1><span class="dot"></span></div>
+      <button id="themeToggle" class="theme-toggle" aria-label="Toggle light/dark theme" title="Toggle light/dark theme">
+        <svg id="themeIconMoon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg id="themeIconSun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+    </div>
     <div class="brand-sub">US Macro Event Reference · Market Effect Lookup</div>
   </div>
 </header>
@@ -1002,6 +1060,24 @@ document.getElementById('compareToggle').addEventListener('click', ()=>{
 });
 document.getElementById('compareClear').addEventListener('click', ()=>{ selectedCompare=[]; updateCompareBar(); render(searchInput.value); });
 document.getElementById('compareOpen').addEventListener('click', openCompare);
+
+/* theme toggle */
+const themeToggle = document.getElementById('themeToggle');
+const themeIconMoon = document.getElementById('themeIconMoon');
+const themeIconSun = document.getElementById('themeIconSun');
+function refreshThemeIcon(){
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  themeIconMoon.style.display = isLight ? 'none' : 'block';
+  themeIconSun.style.display = isLight ? 'block' : 'none';
+}
+refreshThemeIcon();
+themeToggle.addEventListener('click', ()=>{
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  if(isLight) document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', 'light');
+  try{ localStorage.setItem('tremor-theme', isLight ? 'dark' : 'light'); }catch(e){}
+  refreshThemeIcon();
+});
 
 /* back to top */
 const backTop = document.getElementById('backTop');
