@@ -13,7 +13,7 @@
     --panel-2:#171B22;
     --hairline:#2A303B;
     --text-hi:#FFFFFF;
-    --text-lo:#AEB4C0;
+    --text-lo:#C3C8D2;
     --text-mid:#D9DCE3;
     --hot:#FF5C33;
     --hot-dim:#40241A;
@@ -23,6 +23,8 @@
     --amber-dim:#3D3316;
     --info:#A78BFA;
     --info-dim:#2A2145;
+    --low:#C3C8D2;
+    --low-dim:#242A36;
     --header-bg:rgba(10,12,16,0.94);
     --scrim:rgba(6,7,9,0.6);
     color-scheme: dark;
@@ -33,7 +35,7 @@
     --panel-2:#F0EBE0;
     --hairline:#E2DCCB;
     --text-hi:#16181D;
-    --text-lo:#54586A;
+    --text-lo:#494D5C;
     --text-mid:#282B33;
     --hot:#D6431F;
     --hot-dim:#FBE3D8;
@@ -43,6 +45,8 @@
     --amber-dim:#FBEFD2;
     --info:#6D4FD1;
     --info-dim:#ECE6FB;
+    --low:#494D5C;
+    --low-dim:#E7E4D8;
     --header-bg:rgba(246,243,236,0.92);
     --scrim:rgba(30,26,20,0.35);
     color-scheme: light;
@@ -138,12 +142,12 @@
   .cal-row.today{background:var(--hot-dim);}
   .cal-row.today:hover{background:color-mix(in srgb, var(--hot) 22%, var(--hot-dim));}
   .cal-row.soon .cal-date b{color:var(--amber);}
-  .cal-row.past{opacity:0.65;}
-  .cal-row.past:hover{opacity:0.9;}
-  .cal-row.recurring{padding:8px 10px; opacity:0.85;}
+  .cal-row.past{opacity:0.8;}
+  .cal-row.past:hover{opacity:1;}
+  .cal-row.recurring{padding:8px 10px; opacity:0.9;}
   .cal-row.recurring .cal-name{font-size:12.5px; font-weight:500;}
   .cal-row.recurring .cal-date b{font-size:13px;}
-  .cal-row.recurring.past{opacity:0.6;}
+  .cal-row.recurring.past{opacity:0.75;}
   .cal-date{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-lo); line-height:1.4;}
   .cal-date b{display:block; font-size:15px; color:var(--text-hi); font-weight:700;}
   .cal-name{font-size:14px; font-weight:600; color:var(--text-hi);}
@@ -207,7 +211,7 @@
   .b-veryhigh{background:var(--hot-dim); color:var(--hot);}
   .b-high{background:var(--amber-dim); color:var(--amber);}
   .b-medium{background:var(--cold-dim); color:var(--cold);}
-  .b-low{background:#1B1E24; color:var(--text-lo);}
+  .b-low{background:var(--low-dim); color:var(--low);}
   .b-info{background:var(--info-dim); color:var(--info);}
 
   .card-compare-box{position:absolute; top:14px; right:14px; width:18px; height:18px; border-radius:5px; border:1.5px solid var(--hairline); background:var(--ink); display:none;}
@@ -727,7 +731,7 @@ function seismoBars(impact){
   for(let i=1;i<=5;i++){
     const active = i<=n;
     const h = 5 + i*2.6;
-    const color = active ? (impact==="VERY HIGH"?"var(--hot)":impact==="HIGH"?"var(--amber)":impact==="MEDIUM"?"var(--cold)":"var(--text-lo)") : "var(--hairline)";
+    const color = active ? (impact==="VERY HIGH"?"var(--hot)":impact==="HIGH"?"var(--amber)":impact==="MEDIUM"?"var(--cold)":"var(--low)") : "var(--hairline)";
     html += `<i style="height:${h}px;background:${color}"></i>`;
   }
   return html;
@@ -767,7 +771,7 @@ let selectedCompare = []; // array of event names
 
 // Matches the golden-rule-card treatment: colored left border + colored serif title per impact tier.
 function accentColor(impact){
-  return impact==="VERY HIGH" ? "var(--hot)" : impact==="HIGH" ? "var(--amber)" : impact==="MEDIUM" ? "var(--cold)" : impact==="INFO" ? "var(--info)" : "var(--text-lo)";
+  return impact==="VERY HIGH" ? "var(--hot)" : impact==="HIGH" ? "var(--amber)" : impact==="MEDIUM" ? "var(--cold)" : impact==="INFO" ? "var(--info)" : "var(--low)";
 }
 
 function render(filter=""){
@@ -1451,8 +1455,9 @@ function renderCalendar(){
       const weekLabel = isCurrentWeek ? 'This week' : `Week of ${fmtShort(start)}`;
 
       const weekHead = document.createElement('div');
+      if(isCurrentWeek) weekHead.id = 'calCurrentWeek';
       weekHead.style.cssText = isCurrentWeek
-        ? 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--hot); margin:16px 0 6px; padding:6px 10px; background:var(--hot-dim); border-radius:6px; display:inline-block;'
+        ? 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--hot); margin:16px 0 6px; padding:6px 10px; background:var(--hot-dim); border-radius:6px; display:inline-block; scroll-margin-top:var(--sticky-clear, 170px);'
         : 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-lo); margin:16px 0 6px; padding-left:2px;';
       weekHead.textContent = `${weekLabel} — ${fmtShort(start)}–${fmtShort(end)}`;
       block.appendChild(weekHead);
@@ -1487,9 +1492,11 @@ function renderCalendar(){
     calMonths.appendChild(block);
   }
 
-  // auto-jump straight to the current month — no manual scrolling needed
-  if(currentMonthEl){
-    requestAnimationFrame(()=> currentMonthEl.scrollIntoView({behavior:'auto', block:'start'}));
+  // auto-jump straight to the current week — not just the top of the current month
+  const currentWeekEl = document.getElementById('calCurrentWeek');
+  const autoScrollTarget = currentWeekEl || currentMonthEl;
+  if(autoScrollTarget){
+    requestAnimationFrame(()=> autoScrollTarget.scrollIntoView({behavior:'auto', block:'start'}));
   }
   // keep the mobile picker's active chip scrolled into view horizontally
   const activePickerBtn = calMonthPicker.querySelector('button.active');
@@ -1511,13 +1518,15 @@ function renderCalendar(){
 // "suppress the observer for N ms" timeout could safely cover. Measuring fresh
 // on every tick has no such timing assumption to get wrong.
 function activeMonthReferenceLine(){
-  const raw = getComputedStyle(document.documentElement).getPropertyValue('--sticky-clear');
-  const px = parseFloat(raw);
-  // scrollIntoView lands a section's top exactly at the --sticky-clear value (that's what
-  // scroll-margin-top does), so the line must sit slightly BELOW that landing point —
-  // otherwise the section you just tapped to narrowly fails its own "am I current" check
-  // and the previous section keeps the active state by default. (This was backwards before.)
-  return (isFinite(px) ? px : 170) + 14;
+  // Measure the real, current position of the sticky bars every time this is called,
+  // rather than reading the cached --sticky-clear variable — that variable only updates
+  // on resize/transitionend, so it could be briefly stale during the header's collapse
+  // animation (which fires mid-scroll), causing the wrong month to read as "current".
+  const headerBottom = headerEl.getBoundingClientRect().bottom;
+  const picker = document.getElementById('calMonthPicker');
+  const pickerVisible = picker && getComputedStyle(picker).display !== 'none';
+  const pickerBottom = pickerVisible ? picker.getBoundingClientRect().bottom : headerBottom;
+  return Math.max(headerBottom, pickerBottom) + 14;
 }
 
 function setActiveMonthChip(slug){
@@ -1553,7 +1562,12 @@ function setupCalendarScrollSpy(){
 // correct) it once the smooth scroll actually settles — no timers, no direction bias.
 function jumpToMonth(slug){
   setActiveMonthChip(slug);
-  const target = document.getElementById(slug);
+  const todayISO = new Date().toISOString().slice(0,10);
+  const isCurrentMonth = slug === 'calmo-' + todayISO.slice(0,7);
+  const currentWeekEl = document.getElementById('calCurrentWeek');
+  // Jumping to the current month should land you on the current week specifically,
+  // not scrolled to the top of the month (which could show weeks that already passed).
+  const target = (isCurrentMonth && currentWeekEl) ? currentWeekEl : document.getElementById(slug);
   if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
