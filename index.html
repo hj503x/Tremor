@@ -57,6 +57,8 @@
 
   header{padding:32px 24px 22px; border-bottom:1px solid var(--hairline); position:sticky; top:0; z-index:40; background:var(--header-bg); backdrop-filter:blur(10px); transition:padding .2s ease, background-color .25s ease, border-color .25s ease; overflow-anchor:none;}
   html{overflow-anchor:none;}
+  body{overflow-anchor:none;}
+  *{overflow-anchor:none;}
   header.compact{padding:14px 24px;}
   .header-inner{max-width:1100px; margin:0 auto;}
   .header-row{display:flex; align-items:center; justify-content:space-between; gap:12px;}
@@ -194,7 +196,7 @@
     padding:20px 20px 20px 18px; cursor:pointer; transition:border-color .15s ease, background .15s ease, box-shadow .15s ease, transform .15s ease;
   }
   .card:hover{border-color:var(--text-lo); background:color-mix(in srgb, var(--hot) 8%, var(--panel-2)); box-shadow:0 6px 18px rgba(0,0,0,0.35); transform:translateY(-1px);}
-  .card:hover{border-left-width:3px;} /* keep accent width stable on hover */
+  .card:hover{border-left-width:3px;}
   .card:focus-visible{outline:2px solid var(--hot); outline-offset:2px;}
   .card.info-type{border-style:dashed; border-left-style:solid;}
   .card .info-tag{position:absolute; top:14px; right:16px; font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.06em; color:var(--info);}
@@ -219,7 +221,6 @@
   .compare-mode .card .info-tag{display:none;}
   .card-compare-box.checked{background:var(--hot); border-color:var(--hot);}
 
-  /* card hover-reveal preview — desktop pointer devices only */
   .card-preview{display:none;}
   @media (hover:hover) and (min-width:900px){
     .card-preview{
@@ -261,7 +262,6 @@
     .cat-nav a:hover{color:var(--text-hi);}
     .cat-nav a.active{color:var(--hot); border-left-color:var(--hot);}
 
-    /* desktop: horizontal list rows instead of a card grid — accent border · name/sub · badge */
     .grid{display:flex; flex-direction:column; gap:10px;}
     .card{display:flex; align-items:center; gap:18px; padding:18px 22px 18px 20px; min-height:76px;}
     .card .name{margin-bottom:4px; padding-right:0; font-size:16px;}
@@ -309,7 +309,6 @@
     .prow{grid-template-columns:1fr; gap:6px;}
   }
 
-  /* ---------- PANEL (bottom sheet on mobile, right drawer on desktop) ---------- */
   .overlay{
     position:fixed; inset:0; background:var(--scrim); backdrop-filter:blur(3px);
     z-index:100; opacity:0; pointer-events:none; transition:opacity .25s ease;
@@ -318,7 +317,6 @@
   .modal{
     background:var(--panel-2); border:1px solid var(--hairline); z-index:101;
     position:fixed; overflow-y:auto; padding:16px 24px 32px;
-    /* mobile: bottom sheet */
     left:0; right:0; bottom:0; max-height:88vh; border-radius:18px 18px 0 0;
     transform:translateY(100%); transition:transform .28s cubic-bezier(.32,.72,0,1);
   }
@@ -357,7 +355,7 @@
   .corr-section{margin-bottom:18px;}
   .corr-label{font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.05em; color:var(--text-lo); text-transform:uppercase; margin-bottom:9px;}
   .corr-chips{display:flex; flex-wrap:wrap; gap:7px;}
-  .corr-chip{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; padding:5px 11px; border-radius:6px; background:var(--panel); border:1px solid var(--hairline); color:var(--text-hi);}
+  .corr-chip{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:600; padding:5px 11px; border-radius:6px; background:var(--panel); border:1px solid var(--hairline); color:var(--text-hi); cursor:pointer;}
   .info-box{padding:18px; background:var(--info-dim); border:1px solid color-mix(in srgb, var(--info) 45%, var(--hairline)); border-radius:10px; font-size:13.5px; color:var(--text-mid); line-height:1.7;}
   .info-box b{color:var(--info);}
 
@@ -367,7 +365,6 @@
   }
   .related-chip:hover{border-color:var(--hot); color:var(--hot);}
 
-  .corr-chip{cursor:pointer;}
   .glossary-pop{
     margin-top:8px; padding:9px 12px; background:var(--panel); border:1px solid var(--hairline); border-radius:8px;
     font-size:12px; color:var(--text-mid); line-height:1.5; display:none;
@@ -378,8 +375,6 @@
   .magnitude-line b{color:var(--text-mid); font-style:normal;}
 
   footer{text-align:center; padding:20px 24px 50px; color:var(--text-lo); font-size:12px; font-family:'JetBrains Mono',monospace;}
-
-  /* dark shadows tuned for a black background look too harsh on white — soften them in light mode */
   html[data-theme="light"] .card:hover{box-shadow:0 4px 14px rgba(20,18,12,0.10);}
   html[data-theme="light"] .back-top{box-shadow:0 4px 14px rgba(20,18,12,0.14);}
   html[data-theme="light"] .compare-bar{box-shadow:0 8px 24px rgba(20,18,12,0.16);}
@@ -387,7 +382,6 @@
   footer .updated{display:block; margin-top:6px; opacity:0.7;}
 </style>
 <script>
-// Runs synchronously before paint so there's no flash of the wrong theme on load.
 (function(){
   try{
     var saved = localStorage.getItem('tremor-theme');
@@ -1291,8 +1285,8 @@ async function loadLiveOverlay(){
       const liveDates = await relResp.json();
       Object.entries(liveDates).forEach(([name, date])=>{
         if(!date) return;
-        // remove any static/computed entries for this indicator from today forward, replace with the live-confirmed one
         const todayISO = new Date().toISOString().slice(0,10);
+        // remove any static/computed entries for this indicator from today forward, replace with the live-confirmed one
         for(let i=CALENDAR_EVENTS.length-1; i>=0; i--){
           if(CALENDAR_EVENTS[i].name === name && CALENDAR_EVENTS[i].date >= todayISO) CALENDAR_EVENTS.splice(i,1);
         }
@@ -1400,6 +1394,7 @@ function renderCalendar(){
   });
 
   let currentMonthEl = null;
+  let currentWeekMarked = false; // guards against a duplicate id if "this week" straddles a month boundary
 
   for(let m=0; m<12; m++){
     const key = `2026-${pad2(m+1)}`;
@@ -1455,7 +1450,7 @@ function renderCalendar(){
       const weekLabel = isCurrentWeek ? 'This week' : `Week of ${fmtShort(start)}`;
 
       const weekHead = document.createElement('div');
-      if(isCurrentWeek) weekHead.id = 'calCurrentWeek';
+      if(isCurrentWeek && !currentWeekMarked){ weekHead.id = 'calCurrentWeek'; currentWeekMarked = true; }
       weekHead.style.cssText = isCurrentWeek
         ? 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--hot); margin:16px 0 6px; padding:6px 10px; background:var(--hot-dim); border-radius:6px; display:inline-block; scroll-margin-top:var(--sticky-clear, 170px);'
         : 'font-family:JetBrains Mono,monospace; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-lo); margin:16px 0 6px; padding-left:2px;';
@@ -1508,15 +1503,6 @@ function renderCalendar(){
   requestAnimationFrame(syncPickerOffset); // re-measure now that chips are actually populated
 }
 
-// Highlights whichever month is currently in view, in both the desktop sidebar and mobile picker —
-// so there's always a visible "you are here" marker, not just on initial load.
-//
-// This measures layout directly on every scroll tick rather than reacting to
-// IntersectionObserver enter/exit events. The observer approach broke in both
-// directions: forward jumps could catch a stale mid-scroll reading, and backward
-// jumps (e.g. December -> January) simply take longer to animate than any fixed
-// "suppress the observer for N ms" timeout could safely cover. Measuring fresh
-// on every tick has no such timing assumption to get wrong.
 function activeMonthReferenceLine(){
   // Measure the real, current position of the sticky bars every time this is called,
   // rather than reading the cached --sticky-clear variable — that variable only updates
@@ -1526,7 +1512,7 @@ function activeMonthReferenceLine(){
   const picker = document.getElementById('calMonthPicker');
   const pickerVisible = picker && getComputedStyle(picker).display !== 'none';
   const pickerBottom = pickerVisible ? picker.getBoundingClientRect().bottom : headerBottom;
-  return Math.max(headerBottom, pickerBottom) + 14;
+  return Math.max(headerBottom, pickerBottom) + 32; // generous buffer so a freshly-landed section reliably passes its own check
 }
 
 function setActiveMonthChip(slug){
@@ -1536,12 +1522,49 @@ function setActiveMonthChip(slug){
   });
 }
 
+// isProgrammaticScroll gates out scroll-spy updates entirely while a click-triggered
+// smooth-scroll animation is in flight. Trying to keep every *intermediate* reading
+// accurate during a multi-month jump (e.g. Sep -> Nov, passing through Oct) is a losing
+// battle against animation timing — so instead we ignore all the noise mid-flight and
+// only trust the FINAL settled position, detected via a short "no more scroll events"
+// debounce (with a flat timeout as a backstop in case the debounce never fires, e.g.
+// reduced-motion settings skipping the animation entirely).
+let isProgrammaticScroll = false;
+let scrollEndTimer = null;
+
 function updateActiveMonthFromScroll(){
+  if(isProgrammaticScroll) return; // ignore stale mid-jump reads — see comment above
   const sections = document.querySelectorAll('.cal-month');
   if(!sections.length) return;
   const line = activeMonthReferenceLine();
-  let current = sections[0];
-  sections.forEach(s => { if(s.getBoundingClientRect().top <= line) current = s; });
+
+  // Primary check: find the section whose actual rendered span contains the line —
+  // more reliable than "last section whose top passed the line", which can pick the
+  // wrong month if a section is very short or rects get measured mid-layout-shift.
+  let current = null;
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if(rect.top <= line && rect.bottom > line) current = s;
+  });
+
+  // Fallback for edges (very top/bottom of the page, or a gap between sections):
+  // the section whose top is closest to, but not past, the line.
+  if(!current){
+    let bestTop = -Infinity;
+    sections.forEach(s => {
+      const top = s.getBoundingClientRect().top;
+      if(top <= line && top > bestTop){ bestTop = top; current = s; }
+    });
+  }
+
+  // Scrolled to the very bottom of the page (December): the line can end up past every
+  // section's bottom edge without ever falling "inside" one, so force the last section.
+  if((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 10){
+    current = sections[sections.length - 1];
+  }
+
+  if(!current) current = sections[0];
+
   setActiveMonthChip(current.id);
 }
 
@@ -1551,24 +1574,53 @@ function setupCalendarScrollSpy(){
   if(setupCalendarScrollSpy._bound) return; // listener only needs registering once
   setupCalendarScrollSpy._bound = true;
   window.addEventListener('scroll', ()=>{
+    if(isProgrammaticScroll){
+      // Still mid-jump: keep pushing the "settled" timer out until scroll events actually
+      // stop arriving, then do exactly one authoritative check at the true final position.
+      clearTimeout(scrollEndTimer);
+      scrollEndTimer = setTimeout(()=>{
+        isProgrammaticScroll = false;
+        updateActiveMonthFromScroll();
+      }, 120);
+      return;
+    }
+
+    // Normal hand-scrolling: throttle to one measurement per animation frame.
     if(calScrollTicking) return;
     calScrollTicking = true;
-    requestAnimationFrame(()=>{ updateActiveMonthFromScroll(); calScrollTicking = false; });
-  });
+    requestAnimationFrame(()=>{
+      updateActiveMonthFromScroll();
+      calScrollTicking = false;
+    });
+  }, { passive: true });
 }
 
 // Shared handler for month-nav clicks: sets the active state immediately for instant
-// feedback, then lets the same scroll-driven measurement above naturally confirm (or
-// correct) it once the smooth scroll actually settles — no timers, no direction bias.
+// feedback, then suppresses the scroll-spy for the duration of the jump so its stale
+// in-flight readings during the smooth-scroll animation can't override the choice —
+// see the isProgrammaticScroll comment above for why.
 function jumpToMonth(slug){
   setActiveMonthChip(slug);
+  isProgrammaticScroll = true;
+  clearTimeout(scrollEndTimer);
+
   const todayISO = new Date().toISOString().slice(0,10);
   const isCurrentMonth = slug === 'calmo-' + todayISO.slice(0,7);
   const currentWeekEl = document.getElementById('calCurrentWeek');
   // Jumping to the current month should land you on the current week specifically,
   // not scrolled to the top of the month (which could show weeks that already passed).
   const target = (isCurrentMonth && currentWeekEl) ? currentWeekEl : document.getElementById(slug);
-  if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+
+  if(target){
+    target.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  // Flat fallback in case no further scroll events fire at all (e.g. the target was
+  // already fully in view, so the browser never animates and never fires 'scroll').
+  scrollEndTimer = setTimeout(()=>{
+    isProgrammaticScroll = false;
+    updateActiveMonthFromScroll();
+  }, 300);
 }
 
 /* view toggle */
